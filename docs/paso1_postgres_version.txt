@@ -1,0 +1,18 @@
+Evidencia - Paso 1: PostgreSQL en Docker
+Fecha: 2026-11-06
+
+Comando:
+  docker exec ferreteria_db psql -U ferreteria -d ferreteria -c "SELECT version();"
+
+Salida:
+                                                      version
+--------------------------------------------------------------------------------------------------------------------
+ PostgreSQL 18.6 (Debian 18.6-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+(1 row)
+
+Estado del contenedor:
+  NAME            IMAGE         COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+  ferreteria_db   postgres:18   "docker-entrypoint.s..."   db        24 seconds ago   Up 17 seconds (healthy)   0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
+
+Versión estable vigente consultada en postgresql.org el 2026-11-06:
+  PostgreSQL 18.6 (2026-08-13). PostgreSQL 19 solo estaba como RC1 (no estable).

@@ -1,0 +1,35 @@
+﻿=== ANTES ===
+ id_sucursal | id_producto | stock 
+-------------+-------------+-------
+           1 |           3 |    20
+           2 |           3 |    12
+(2 rows)
+
+=== EJECUTAR TRASPASO T-DEMO-01 (2 cemento Cancun -> Playa) ===
+ id_traspaso 
+-------------
+           1
+(1 row)
+
+=== DESPUES ===
+ id_sucursal | id_producto | stock 
+-------------+-------------+-------
+           1 |           3 |    18
+           2 |           3 |    14
+(2 rows)
+
+   folio   | sucursal_origen | sucursal_destino |   estado   
+-----------+-----------------+------------------+------------
+ T-DEMO-01 |               1 |                2 | completado
+(1 row)
+
+ id_bitacora | tabla_afectada | operacion | id_registro 
+-------------+----------------+-----------+-------------
+          25 | traspaso       | TRASPASO  |           1
+          24 | inventario     | UPDATE    |          20
+          23 | inventario     | UPDATE    |          15
+          21 | venta          | VENTA     |           3
+          20 | inventario     | UPDATE    |          18
+          19 | venta          | INSERT    |           3
+(6 rows)
+

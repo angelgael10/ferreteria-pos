@@ -1,0 +1,167 @@
+SISTEMA DE INVENTARIO Y POS MULTISUCURSAL - FERRETERIA
+EVIDENCIA: BASE DE DATOS DISTRIBUIDA (U.V)
+Fecha de ejecucion: 2026-11-17 (UTC)
+PostgreSQL 18.6 en Docker
+
+TOPOLOGIA
+- Red Docker: dist_net
+- Nodo A (primario de replicacion): contenedor dist_a, puerto host 5436
+- Nodo B (nodo remoto para FDW y 2PC): contenedor dist_b, puerto host 5437
+- Replica streaming del nodo A: contenedor dist_replica, puerto host 5438
+- Volumenes: dist_a_data, dist_b_data, dist_replica_data, dist_backup
+- Configuracion: max_prepared_transactions=10 (A, B y replica), wal_level=replica (A)
+- Autenticacion de laboratorio: POSTGRES_HOST_AUTH_METHOD=trust (solo demo local)
+
+=== 1. PARTICIONAMIENTO POR SUCURSAL (NODO A) ===
+                                                               Partitioned table "public.venta_part"
+   Column    |           Type           | Collation | Nullable |                   Default                    | Storage | Compression | Stats target | Description 
+-------------+--------------------------+-----------+----------+----------------------------------------------+---------+-------------+--------------+-------------
+ id_venta    | integer                  |           | not null | nextval('venta_part_id_venta_seq'::regclass) | plain   |             |              | 
+ id_sucursal | integer                  |           | not null |                                              | plain   |             |              | 
+ total       | numeric(10,2)            |           | not null |                                              | main    |             |              | 
+ fecha       | timestamp with time zone |           | not null | now()                                        | plain   |             |              | 
+Partition key: LIST (id_sucursal)
+Indexes:
+    "venta_part_pkey" PRIMARY KEY, btree (id_venta, id_sucursal)
+Not-null constraints:
+    "venta_part_id_venta_not_null" NOT NULL "id_venta"
+    "venta_part_id_sucursal_not_null" NOT NULL "id_sucursal"
+    "venta_part_total_not_null" NOT NULL "total"
+    "venta_part_fecha_not_null" NOT NULL "fecha"
+Partitions: venta_part_cancun FOR VALUES IN (1),
+            venta_part_chetumal FOR VALUES IN (3),
+            venta_part_playa FOR VALUES IN (2)
+
+      particion      | filas 
+---------------------+-------
+ venta_part_cancun   |     2
+ venta_part_playa    |     1
+ venta_part_chetumal |     1
+(3 rows)
+
+                                                        QUERY PLAN                                                        
+--------------------------------------------------------------------------------------------------------------------------
+ Seq Scan on venta_part_playa venta_part  (cost=0.00..27.00 rows=7 width=32) (actual time=0.012..0.012 rows=1.00 loops=1)
+   Filter: (id_sucursal = 2)
+   Buffers: shared hit=1
+ Planning Time: 0.153 ms
+ Execution Time: 0.039 ms
+(5 rows)
+
+
+=== 2. REPLICACION STREAMING (NODO A -> REPLICA) ===
+ client_addr |   state   | sent_lsn  | replay_lsn | sync_state 
+-------------+-----------+-----------+------------+------------
+ 172.19.0.4  | streaming | 0/3086928 | 0/3086928  | async
+(1 row)
+
+INSERT 0 1
+ lsn_actual 
+------------
+ 0/30869D8
+(1 row)
+
+ id | id_sucursal | id_producto | stock 
+----+-------------+-------------+-------
+  4 |           1 |         999 |    42
+  8 |           1 |         998 |    77
+(2 rows)
+
+--- Consulta en la replica (solo lectura) ---
+ en_recuperacion 
+-----------------
+ t
+(1 row)
+
+ id | id_sucursal | id_producto | stock 
+----+-------------+-------------+-------
+  4 |           1 |         999 |    42
+  7 |           1 |         501 |     7
+  8 |           1 |         998 |    77
+(3 rows)
+
+
+=== 3. CONSULTA DISTRIBUIDA CON postgres_fdw (A -> B) ===
+CREATE EXTENSION
+psql:<stdin>:1: NOTICE:  extension "postgres_fdw" already exists, skipping
+psql:<stdin>:2: NOTICE:  drop cascades to 2 other objects
+DETAIL:  drop cascades to user mapping for ferreteria on server srv_b
+drop cascades to foreign table inventario_b_remoto
+DROP SERVER
+CREATE SERVER
+CREATE USER MAPPING
+CREATE FOREIGN TABLE
+ id_sucursal | id_producto | stock 
+-------------+-------------+-------
+           2 |         201 |     5
+           3 |         202 |     6
+           2 |         501 |     8
+(3 rows)
+
+
+=== 4. TRANSACCION DISTRIBUIDA EN DOS FASES (2PC) ===
+--- Preparar en nodo A ---
+BEGIN
+INSERT 0 1
+PREPARE TRANSACTION
+--- Preparar en nodo B ---
+BEGIN
+INSERT 0 1
+PREPARE TRANSACTION
+--- pg_prepared_xacts en nodo A ---
+       gid       |           prepared           |   owner    |  database  
+-----------------+------------------------------+------------+------------
+ traspaso_2pc_a2 | 2026-11-17 01:51:04.42072+00 | ferreteria | ferreteria
+(1 row)
+
+--- pg_prepared_xacts en nodo B ---
+       gid       |           prepared           |   owner    |  database  
+-----------------+------------------------------+------------+------------
+ traspaso_2pc_b2 | 2026-11-17 01:51:04.57147+00 | ferreteria | ferreteria
+(1 row)
+
+--- COMMIT PREPARED en nodo A ---
+COMMIT PREPARED
+ gid 
+-----
+(0 rows)
+
+ id | id_sucursal | id_producto | stock 
+----+-------------+-------------+-------
+  9 |           1 |         502 |     9
+(1 row)
+
+--- COMMIT PREPARED en nodo B ---
+COMMIT PREPARED
+ gid 
+-----
+(0 rows)
+
+ id | id_sucursal | id_producto | stock 
+----+-------------+-------------+-------
+  5 |           2 |         502 |    10
+(1 row)
+
+
+=== 5. NOTAS DE EJECUCION ===
+- El particionamiento por LIST permitio poda de particiones: el EXPLAIN de id_sucursal=2 solo lee venta_part_playa.
+- La replica es fisica (streaming): se verifico pg_is_in_recovery = t y la aparicion de filas insertadas en el primario.
+- postgres_fdw permite consultar la tabla remota del nodo B desde el nodo A.
+- LIMITACION REAL ENCONTRADA: postgres_fdw de PostgreSQL no permite PREPARE TRANSACTION cuando la
+  transaccion toco tablas foraneas; devuelve:
+  "ERROR: cannot PREPARE a transaction that has operated on postgres_fdw foreign tables".
+  Por eso el 2PC se demostro con dos transacciones preparadas explicitas (una en cada nodo),
+  verificando pg_prepared_xacts en ambos y luego COMMIT PREPARED en ambos. Es el mecanismo base de 2PC.
+- Los nodos usan trust auth solo para el laboratorio local; en produccion se usaria scram-sha-256 y red privada.
+
+=== 6. COMO REPETIRLO (RESUMEN) ===
+docker network create dist_net
+docker run -d --name dist_a --network dist_net -e POSTGRES_USER=ferreteria -e POSTGRES_PASSWORD=demo_dist ^
+  -e POSTGRES_DB=ferreteria -e POSTGRES_HOST_AUTH_METHOD=trust -p 5436:5432 ^
+  -v dist_a_data:/var/lib/postgresql postgres:18 -c max_prepared_transactions=10 -c wal_level=replica
+docker run -d --name dist_b --network dist_net -e POSTGRES_USER=ferreteria -e POSTGRES_PASSWORD=demo_dist ^
+  -e POSTGRES_DB=ferreteria -e POSTGRES_HOST_AUTH_METHOD=trust -p 5437:5432 ^
+  -v dist_b_data:/var/lib/postgresql postgres:18 -c max_prepared_transactions=10
+(crear tablas; agregar "host replication all all trust" a pg_hba de A; CREATE ROLE replicador)
+pg_basebackup -h dist_a -U replicador -D /var/lib/postgresql/18/docker -Xs -P  (en volumen de replica)
+(crear standby.signal y primary_conninfo; iniciar dist_replica con -c max_prepared_transactions=10)

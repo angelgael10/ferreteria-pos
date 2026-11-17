@@ -2,6 +2,11 @@
 
 Proyecto integrador (Programación Web + Bases de Datos). Sucursales: Cancún, Playa del Carmen, Chetumal.
 
+## Repositorio y tablero
+- Repositorio: https://github.com/angelgael10/ferreteria-pos
+- Tablero: https://github.com/users/angelgael10/projects/1
+- Historial de commits por sprint y 18 issues (15 cerrados y 3 pendientes de evidencia).
+
 ## Stack
 - **Base de datos:** PostgreSQL 18 en Docker
 - **Backend:** Node.js + Express (API/MVC)
@@ -57,6 +62,6 @@ npm run dev
 Detalle en `docs/evidencias/` y `docs/ESTUDIO_PROYECTO.md`.
 
 ## Pendientes para el entregable
-- Capturas de pantalla del frontend y de las sesiones de concurrencia.
-- Repositorio en GitHub con ramas/commits y tablero del proyecto.
-- Token gratuito de Banxico en `app/backend/.env` para la consulta exitosa.
+- Capturas de pantalla del frontend y de las sesiones de concurrencia (issue #16).
+- Token gratuito de Banxico en `app/backend/.env` para la consulta exitosa (issue #17).
+- Cerrar el issue #8 al completar la consulta real de Banxico.

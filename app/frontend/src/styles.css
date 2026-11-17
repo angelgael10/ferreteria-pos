@@ -1,0 +1,25 @@
+/* styles.css - estilos globales simples para la aplicación */
+/* Estilo base del cuerpo del documento */
+body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f8; color: #222; } /* fuente legible y fondo claro */
+/* Contenedor principal centrado con ancho máximo */
+.contenedor { max-width: 1100px; margin: 0 auto; padding: 16px; } /* centra el contenido */
+/* Barra superior de navegación */
+.barra { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; } /* acomoda botones en fila */
+/* Botones generales */
+button { padding: 8px 12px; border: 1px solid #1976d2; background: #1976d2; color: #fff; border-radius: 4px; cursor: pointer; } /* estilo de botón */
+/* Botón secundario */
+button.sec { background: #fff; color: #1976d2; } /* variante secundaria */
+/* Campos de entrada y selects */
+input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; } /* estilo de inputs */
+/* Tarjetas/secciones */
+.card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px; margin-bottom: 12px; } /* recuadro blanco */
+/* Tablas simples */
+table { width: 100%; border-collapse: collapse; } /* tabla sin espacios dobles */
+th, td { border: 1px solid #ddd; padding: 6px; text-align: left; } /* celdas con borde */
+th { background: #eef3f7; } /* encabezado de tabla */
+/* Mensajes */
+.error { color: #b00020; } /* texto de error en rojo */
+.ok { color: #1b5e20; } /* texto de éxito en verde */
+/* Disposición en columnas flexibles */
+.fila { display: flex; gap: 12px; flex-wrap: wrap; } /* filas flexibles */
+.col { flex: 1; min-width: 280px; } /* columnas responsivas */

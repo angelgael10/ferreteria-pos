@@ -1,1 +1,18 @@
+# Variables de entorno con secretos (no subir al repositorio)
 .env
+
+# Dependencias de Node.js instaladas localmente
+node_modules/
+
+# Archivos compilados/generados del frontend y backend
+dist/
+build/
+
+# Archivos de log generados en ejecución
+*.log
+npm-debug.log*
+
+# Archivos temporales del sistema operativo y editores
+.DS_Store
+Thumbs.db
+.vscode/

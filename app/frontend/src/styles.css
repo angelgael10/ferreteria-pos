@@ -1,25 +1,878 @@
-/* styles.css - estilos globales simples para la aplicación */
-/* Estilo base del cuerpo del documento */
-body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f8; color: #222; } /* fuente legible y fondo claro */
-/* Contenedor principal centrado con ancho máximo */
-.contenedor { max-width: 1100px; margin: 0 auto; padding: 16px; } /* centra el contenido */
-/* Barra superior de navegación */
-.barra { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; } /* acomoda botones en fila */
-/* Botones generales */
-button { padding: 8px 12px; border: 1px solid #1976d2; background: #1976d2; color: #fff; border-radius: 4px; cursor: pointer; } /* estilo de botón */
-/* Botón secundario */
-button.sec { background: #fff; color: #1976d2; } /* variante secundaria */
-/* Campos de entrada y selects */
-input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; } /* estilo de inputs */
-/* Tarjetas/secciones */
-.card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px; margin-bottom: 12px; } /* recuadro blanco */
-/* Tablas simples */
-table { width: 100%; border-collapse: collapse; } /* tabla sin espacios dobles */
-th, td { border: 1px solid #ddd; padding: 6px; text-align: left; } /* celdas con borde */
-th { background: #eef3f7; } /* encabezado de tabla */
-/* Mensajes */
-.error { color: #b00020; } /* texto de error en rojo */
-.ok { color: #1b5e20; } /* texto de éxito en verde */
-/* Disposición en columnas flexibles */
-.fila { display: flex; gap: 12px; flex-wrap: wrap; } /* filas flexibles */
-.col { flex: 1; min-width: 280px; } /* columnas responsivas */
+/* ============================================================
+   styles.css - Hoja de estilos global de la aplicación
+   Aquí se concentra todo el aspecto visual: colores, tipografía,
+   tarjetas, botones, tablas y adaptación a pantallas pequeñas.
+   La lógica de la aplicación vive en App.jsx; este archivo solo
+   controla cómo se ve.
+   ============================================================ */
+
+/* ============================================================
+   1. VARIABLES DE DISEÑO
+   Centralizan colores, sombras, radios y tiempos de transición.
+   Si se cambia un valor aquí, se actualiza todo el sistema visual.
+   ============================================================ */
+:root {
+  --azul-900: #0b3a5b; /* Azul oscuro: encabezado y textos principales */
+  --azul-700: #0f4c81; /* Azul principal: botones y enlaces */
+  --azul-500: #1976d2; /* Azul medio: focos y detalles */
+  --azul-100: #e8f1fa; /* Azul claro: fondos suaves y encabezados de tabla */
+  --ambar-500: #f59e0b; /* Ámbar: acento y totales */
+  --ambar-100: #fef3c7; /* Ámbar claro: avisos suaves */
+  --verde-700: #15803d; /* Verde: estados correctos */
+  --verde-100: #dcfce7; /* Verde claro: fondo de éxito */
+  --rojo-700: #b91c1c; /* Rojo: errores y acciones destructivas */
+  --rojo-100: #fee2e2; /* Rojo claro: fondo de error */
+  --gris-900: #1f2937; /* Texto principal */
+  --gris-700: #374151; /* Texto secundario fuerte */
+  --gris-500: #6b7280; /* Texto de ayuda */
+  --gris-300: #d1d5db; /* Bordes de campos */
+  --gris-200: #e5e7eb; /* Bordes de tarjetas y tablas */
+  --gris-100: #f3f4f6; /* Fondos neutros */
+  --blanco: #ffffff; /* Superficies de tarjetas */
+  --fondo: #eef3f8; /* Fondo general de la página */
+  --radio-sm: 8px; /* Radios pequeños: campos y botones */
+  --radio: 12px; /* Radios medianos: tarjetas */
+  --radio-lg: 18px; /* Radios grandes: encabezado */
+  --sombra-sm: 0 1px 2px rgba(15, 23, 42, 0.06); /* Sombra sutil */
+  --sombra: 0 10px 30px rgba(11, 58, 91, 0.10); /* Sombra de encabezado */
+  --transicion: 160ms ease; /* Velocidad uniforme de animaciones */
+}
+
+/* ============================================================
+   2. RESET Y ESTILOS BASE
+   Normalizan márgenes, tipografía y fondo para que el diseño
+   se vea igual en Chrome, Edge y Firefox.
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box; /* El padding no aumenta el ancho total */
+}
+
+html {
+  scroll-behavior: smooth; /* Desplazamiento suave al navegar */
+}
+
+body {
+  margin: 0; /* Elimina el margen por defecto del navegador */
+  min-height: 100vh; /* Ocupa toda la altura de la ventana */
+  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif; /* Tipografía legible del sistema */
+  line-height: 1.5; /* Espaciado cómodo entre líneas */
+  color: var(--gris-900); /* Color de texto principal */
+  background:
+    radial-gradient(circle at top left, rgba(25, 118, 210, 0.12), transparent 34rem),
+    var(--fondo); /* Fondo claro con un brillo azul suave */
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin-top: 0; /* Evita espacios superiores inconsistentes */
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.2; /* Títulos más compactos */
+}
+
+button,
+input,
+select {
+  font: inherit; /* Usa la misma tipografía del resto de la página */
+}
+
+::selection {
+  background: var(--ambar-100); /* Color al seleccionar texto */
+  color: var(--azul-900);
+}
+
+/* ============================================================
+   3. CONTENEDOR Y ENCABEZADO
+   El contenedor limita el ancho de la aplicación. El encabezado
+   presenta la marca, el nombre del sistema y el usuario activo.
+   ============================================================ */
+.contenedor {
+  width: min(1200px, 100%); /* Ancho máximo legible en escritorio */
+  margin: 0 auto; /* Centra horizontalmente */
+  padding: 24px 20px 48px; /* Espacio interno de la página */
+}
+
+.encabezado {
+  display: flex; /* Marca a la izquierda y usuario a la derecha */
+  align-items: center; /* Alineación vertical centrada */
+  justify-content: space-between; /* Separa los dos bloques */
+  gap: 16px; /* Espacio entre marca y usuario */
+  margin-bottom: 20px; /* Separación con la navegación */
+  padding: 18px 22px; /* Espacio interno del encabezado */
+  color: var(--blanco); /* Texto claro sobre azul */
+  background: linear-gradient(135deg, var(--azul-900), var(--azul-700)); /* Degradado de marca */
+  border-radius: var(--radio-lg); /* Esquinas redondeadas */
+  box-shadow: var(--sombra); /* Profundidad visual */
+}
+
+.marca {
+  display: flex; /* Icono y texto en una sola fila */
+  align-items: center; /* Centra verticalmente */
+  gap: 14px; /* Separación entre icono y texto */
+  min-width: 0; /* Permite que el texto largo se adapte */
+}
+
+.marca-icono {
+  display: grid; /* Centra la letra dentro del cuadro */
+  place-items: center;
+  flex: 0 0 auto; /* Evita que el icono se encoja */
+  width: 48px;
+  height: 48px;
+  font-size: 1.5rem; /* Tamaño de la letra F */
+  font-weight: 800;
+  color: var(--azul-900); /* Letra oscura sobre ámbar */
+  background: var(--ambar-500); /* Cuadro de acento */
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+
+.encabezado h1 {
+  margin: 0; /* Sin margen porque el encabezado ya tiene padding */
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem); /* Crece según la pantalla */
+  letter-spacing: -0.02em; /* Título ligeramente compacto */
+}
+
+.subtitulo {
+  margin: 4px 0 0; /* Pegado al título */
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.78); /* Texto secundario sobre azul */
+}
+
+.usuario-chip {
+  display: flex; /* Nombre y rol en dos líneas */
+  flex-direction: column;
+  align-items: flex-end; /* Alineado a la derecha */
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  font-size: 0.78rem;
+  background: rgba(255, 255, 255, 0.12); /* Fondo translúcido */
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px; /* Forma de píldora */
+}
+
+.usuario-chip strong {
+  font-size: 0.86rem; /* Nombre más visible */
+}
+
+.usuario-chip span {
+  color: rgba(255, 255, 255, 0.72); /* Rol en tono suave */
+  text-transform: capitalize; /* Primera letra de cada palabra */
+}
+
+/* ============================================================
+   4. NAVEGACIÓN
+   Barra flotante con las vistas principales. El botón de la
+   vista activa usa la clase .activo para resaltarse.
+   ============================================================ */
+.barra {
+  position: sticky; /* Se queda visible al hacer scroll */
+  top: 12px;
+  z-index: 10; /* Queda por encima de las tarjetas */
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap; /* En móvil los botones bajan de línea */
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.94); /* Fondo casi opaco */
+  border: 1px solid var(--gris-200);
+  border-radius: 999px;
+  box-shadow: var(--sombra-sm);
+  backdrop-filter: blur(10px); /* Difumina el contenido detrás */
+}
+
+.barra button {
+  padding: 8px 14px;
+  border-radius: 999px; /* Botones tipo pestaña */
+}
+
+.barra button.activo {
+  color: var(--blanco);
+  background: var(--azul-700);
+  border-color: var(--azul-700);
+  box-shadow: 0 4px 12px rgba(15, 76, 129, 0.25);
+}
+
+.barra button.sec {
+  color: var(--azul-700);
+  background: var(--blanco);
+  border-color: var(--gris-200);
+}
+
+.barra button.sec:hover:not(:disabled) {
+  color: var(--azul-900);
+  background: var(--azul-100);
+  border-color: var(--azul-500);
+}
+
+/* ============================================================
+   5. TARJETAS Y ENCABEZADOS DE SECCIÓN
+   Cada módulo (productos, inventario, POS, reportes) se muestra
+   dentro de una tarjeta blanca para separar visualmente el contenido.
+   ============================================================ */
+.card {
+  margin-bottom: 16px;
+  padding: 20px;
+  background: var(--blanco);
+  border: 1px solid var(--gris-200);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra-sm);
+}
+
+.card h3 {
+  margin-bottom: 14px;
+  font-size: 1.05rem;
+  color: var(--azul-900);
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-header h3 {
+  margin: 0; /* El espaciado lo controla .card-header */
+}
+
+.texto-ayuda {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--gris-500); /* Texto secundario debajo del título */
+}
+
+.contador {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--azul-700);
+  white-space: nowrap;
+  background: var(--azul-100);
+  border-radius: 999px;
+}
+
+/* ============================================================
+   6. FORMULARIOS
+   Campos de texto, correo, contraseña y selectores de sucursal.
+   El foco se marca con un halo azul para accesibilidad.
+   ============================================================ */
+label {
+  display: inline-block;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gris-700);
+}
+
+input,
+select {
+  width: 100%; /* Los campos ocupan el ancho de su columna */
+  padding: 10px 12px;
+  color: var(--gris-900);
+  background: var(--blanco);
+  border: 1px solid var(--gris-300);
+  border-radius: var(--radio-sm);
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+}
+
+input::placeholder {
+  color: var(--gris-500); /* Texto de ejemplo más suave */
+}
+
+input:focus,
+select:focus {
+  border-color: var(--azul-500);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.18); /* Halo de foco */
+}
+
+.buscador {
+  margin-bottom: 12px; /* Separa la búsqueda de los resultados */
+}
+
+.barra-sucursal {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 20px;
+}
+
+.barra-sucursal label {
+  margin: 0; /* La alineación la controla el contenedor flex */
+}
+
+.barra-sucursal select {
+  width: auto; /* El selector no necesita todo el ancho */
+  min-width: 220px;
+}
+
+.sucursal-actual {
+  margin-left: auto; /* Empuja el texto a la derecha */
+  font-size: 0.85rem;
+  color: var(--gris-500);
+}
+
+.sucursal-actual strong {
+  color: var(--azul-700);
+}
+
+.login-card {
+  max-width: 640px; /* Formulario de login más angosto */
+  margin: 24px auto;
+}
+
+.login-card button[type="submit"] {
+  width: 100%; /* Botón de entrar a todo lo ancho */
+  margin-top: 8px;
+}
+
+.demo {
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  font-size: 0.84rem;
+  color: var(--azul-900);
+  background: var(--azul-100);
+  border-left: 4px solid var(--azul-500); /* Marca visual de ayuda */
+  border-radius: var(--radio-sm);
+}
+
+/* ============================================================
+   7. BOTONES
+   Botón principal azul, botón secundario blanco y variantes
+   pequeñas o de peligro para el carrito.
+   ============================================================ */
+button {
+  padding: 10px 16px;
+  font-weight: 600;
+  color: var(--blanco);
+  background: var(--azul-700);
+  border: 1px solid transparent;
+  border-radius: var(--radio-sm);
+  cursor: pointer;
+  transition: background var(--transicion), border-color var(--transicion), transform var(--transicion), box-shadow var(--transicion);
+}
+
+button:hover:not(:disabled) {
+  background: var(--azul-900);
+  transform: translateY(-1px); /* Pequeño efecto de elevación */
+  box-shadow: 0 6px 14px rgba(11, 58, 91, 0.18);
+}
+
+button:focus-visible {
+  outline: 3px solid var(--ambar-500); /* Foco visible con el color de acento */
+  outline-offset: 2px;
+}
+
+button:disabled {
+  opacity: 0.45; /* Se ve desactivado */
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+button.sec {
+  color: var(--azul-700);
+  background: var(--blanco);
+  border-color: var(--gris-300);
+}
+
+button.sec:hover:not(:disabled) {
+  color: var(--azul-900);
+  background: var(--azul-100);
+  border-color: var(--azul-500);
+}
+
+button.peligro {
+  color: var(--rojo-700);
+  background: var(--blanco);
+  border-color: #fecaca;
+}
+
+button.peligro:hover:not(:disabled) {
+  color: var(--blanco);
+  background: var(--rojo-700);
+  border-color: var(--rojo-700);
+}
+
+button.btn-mini {
+  padding: 4px 9px;
+  font-size: 0.78rem;
+  border-radius: 6px;
+}
+
+button.btn-cantidad {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--azul-700);
+  background: var(--azul-100);
+  border: 1px solid var(--azul-500);
+  border-radius: 6px;
+}
+
+button.btn-cantidad:hover:not(:disabled) {
+  color: var(--blanco);
+  background: var(--azul-700);
+}
+
+/* ============================================================
+   8. TABLAS
+   Se envuelven en .tabla-scroll para que en móvil se desplacen
+   horizontalmente sin romper el diseño de la tarjeta.
+   ============================================================ */
+.tabla-scroll {
+  width: 100%;
+  overflow-x: auto; /* Scroll horizontal solo si hace falta */
+  border-radius: var(--radio-sm);
+}
+
+table {
+  width: 100%;
+  min-width: 620px; /* Evita que las columnas se aplasten */
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--gris-200);
+}
+
+thead th {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--azul-900);
+  text-transform: uppercase; /* Encabezados más compactos */
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  background: var(--azul-100);
+}
+
+tbody tr:nth-child(even) {
+  background: #f8fafc; /* Filas alternas para facilitar la lectura */
+}
+
+tbody tr:hover {
+  background: var(--azul-100); /* Resalta la fila bajo el cursor */
+}
+
+td.numero,
+th.numero {
+  text-align: right; /* Números alineados a la derecha */
+  font-variant-numeric: tabular-nums; /* Dígitos de ancho uniforme */
+}
+
+.etiqueta {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  color: var(--gris-700);
+  background: var(--gris-100);
+  border: 1px solid var(--gris-200);
+  border-radius: 999px;
+}
+
+.tabla-carrito {
+  min-width: 540px; /* El carrito necesita menos ancho que otras tablas */
+}
+
+.control-cantidad {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ============================================================
+   9. BADGES DE STOCK
+   Indican de un vistazo si un producto está disponible, bajo
+   o agotado. Se generan desde App.jsx con <BadgeStock />.
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+.badge-ok {
+  color: var(--verde-700);
+  background: var(--verde-100);
+}
+
+.badge-bajo {
+  color: #92400e;
+  background: var(--ambar-100);
+}
+
+.badge-agotado {
+  color: var(--rojo-700);
+  background: var(--rojo-100);
+}
+
+/* ============================================================
+   10. MENSAJES Y ALERTAS
+   Los errores y confirmaciones se muestran como bloques de color
+   para que el usuario los note sin revisar la consola.
+   ============================================================ */
+.alerta {
+  margin: 0 0 16px;
+  padding: 11px 14px;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+  border-radius: var(--radio-sm);
+}
+
+.alerta-error {
+  color: var(--rojo-700);
+  background: var(--rojo-100);
+  border-color: #fecaca;
+}
+
+.alerta-ok {
+  color: var(--verde-700);
+  background: var(--verde-100);
+  border-color: #bbf7d0;
+}
+
+.card .alerta {
+  margin: 12px 0 0; /* Dentro de una tarjeta se separa solo arriba */
+}
+
+.error {
+  color: var(--rojo-700); /* Compatibilidad con estilos anteriores */
+}
+
+.ok {
+  color: var(--verde-700); /* Compatibilidad con estilos anteriores */
+}
+
+.vacio {
+  margin: 8px 0 0;
+  padding: 24px 16px;
+  color: var(--gris-500);
+  text-align: center;
+  background: var(--gris-100);
+  border: 1px dashed var(--gris-300); /* Indica zona sin contenido */
+  border-radius: var(--radio-sm);
+}
+
+/* ============================================================
+   11. COLUMNAS FLEXIBLES
+   Se usan en el login y en cualquier sección que necesite dos
+   columnas que se apilen en pantallas pequeñas.
+   ============================================================ */
+.fila {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.col {
+  flex: 1 1 320px; /* Crece y se encoge, con base de 320px */
+  min-width: 0; /* Permite que los hijos se adapten sin desbordar */
+}
+
+/* ============================================================
+   12. PUNTO DE VENTA (POS)
+   Dos columnas: búsqueda de productos a la izquierda y carrito
+   a la derecha. En tablet se apilan automáticamente.
+   ============================================================ */
+.pos-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.producto-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none; /* Quita viñetas de la lista */
+}
+
+.producto-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--blanco);
+  border: 1px solid var(--gris-200);
+  border-radius: var(--radio-sm);
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+}
+
+.producto-item:hover {
+  border-color: var(--azul-500);
+  box-shadow: var(--sombra-sm);
+}
+
+.producto-info {
+  min-width: 0; /* Permite que el texto largo se recorte o ajuste */
+}
+
+.producto-info strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Nombre largo con puntos suspensivos */
+  white-space: nowrap;
+}
+
+.producto-info small {
+  color: var(--gris-500);
+}
+
+.producto-precio {
+  font-weight: 700;
+  color: var(--azul-700);
+  white-space: nowrap;
+}
+
+.total-caja {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 12px 16px;
+  color: var(--blanco);
+  background: var(--azul-900);
+  border-radius: var(--radio-sm);
+}
+
+.total-caja strong {
+  font-size: 1.3rem;
+  color: var(--ambar-500); /* El total resalta en ámbar */
+}
+
+.acciones-carrito {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* ============================================================
+   13. REPORTES
+   Rejilla de tarjetas para tipo de cambio, ventas y existencias.
+   Se adapta automáticamente al ancho disponible.
+   ============================================================ */
+.reportes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 16px;
+}
+
+.reportes-grid .card {
+  margin-bottom: 0; /* La separación la maneja el grid */
+}
+
+.reporte-card h3 {
+  font-size: 1rem;
+}
+
+.tipo-cambio {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tipo-cambio strong {
+  font-size: 1.35rem;
+  color: var(--azul-900);
+}
+
+/* ============================================================
+   14. RESPONSIVE
+   Ajustes para tablet y móvil: se apilan columnas, el encabezado
+   se vuelve vertical y las tablas conservan el scroll horizontal.
+   ============================================================ */
+@media (max-width: 900px) {
+  .encabezado {
+    align-items: flex-start;
+    flex-direction: column; /* Marca arriba, usuario abajo */
+  }
+
+  .usuario-chip {
+    align-items: flex-start;
+  }
+
+  .pos-grid {
+    grid-template-columns: 1fr; /* POS en una sola columna */
+  }
+
+  .sucursal-actual {
+    margin-left: 0; /* Ya no se empuja a la derecha */
+  }
+}
+
+@media (max-width: 640px) {
+  .contenedor {
+    padding: 12px 12px 32px; /* Menos margen en pantallas pequeñas */
+  }
+
+  .encabezado {
+    padding: 16px;
+    border-radius: var(--radio);
+  }
+
+  .marca-icono {
+    width: 42px;
+    height: 42px;
+    font-size: 1.25rem;
+  }
+
+  .barra {
+    position: static; /* En móvil no se queda flotando */
+    border-radius: var(--radio);
+  }
+
+  .barra button {
+    flex: 1 1 auto; /* Los botones se reparten el ancho */
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .card-header {
+    flex-direction: column; /* Título y contador en dos líneas */
+  }
+
+  .barra-sucursal select {
+    width: 100%; /* El selector ocupa todo el ancho */
+  }
+
+  .fila {
+    flex-direction: column; /* Columnas del login apiladas */
+  }
+
+  .col {
+    width: 100%;
+  }
+
+  table {
+    min-width: 560px; /* Mantiene legibilidad con scroll */
+    font-size: 0.86rem;
+  }
+
+  th,
+  td {
+    padding: 8px;
+  }
+
+  .acciones-carrito {
+    justify-content: stretch; /* Botones a todo el ancho */
+  }
+
+  .acciones-carrito button {
+    flex: 1 1 auto;
+  }
+}
+
+/* ============================================================
+   15. ACCESIBILIDAD Y MOVIMIENTO REDUCIDO
+   Si el usuario configuró menos animaciones en su sistema,
+   se desactivan las transiciones para evitar molestias.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.acciones-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.formulario-producto,
+.formulario-postal {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 16px;
+  background: var(--gris-100);
+  border-radius: var(--radio);
+}
+
+.formulario-postal {
+  grid-template-columns: 1fr auto auto;
+  align-items: end;
+}
+
+.formulario-postal label {
+  grid-column: 1 / -1;
+}
+
+.postal-resultado {
+  padding: 14px 16px;
+  background: var(--azul-100);
+  border-left: 4px solid var(--azul-700);
+  border-radius: var(--radio-sm);
+}
+
+.lista-asentamientos {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  columns: 2;
+}
+
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 8px 0;
+  color: var(--gris-500);
+  font-size: 0.85rem;
+}
+
+.alerta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+@media (max-width: 720px) {
+  .formulario-postal {
+    grid-template-columns: 1fr;
+  }
+
+  .lista-asentamientos {
+    columns: 1;
+  }
+}

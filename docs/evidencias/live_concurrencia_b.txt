@@ -1,0 +1,19 @@
+\timing on
+Timing is on.
+BEGIN;
+BEGIN
+Time: 0.305 ms
+SELECT 'CAJA B - intenta vender el mismo articulo' AS evento, now() AS momento;
+                  evento                   |            momento
+-------------------------------------------+-------------------------------
+ CAJA B - intenta vender el mismo articulo | 2026-11-25 22:57:18.534682+00
+(1 row)
+
+Time: 0.769 ms
+SELECT registrar_venta('V-CONC-LIVE-B', 1, 4, '[{"id_producto":6,"cantidad":1,"precio_unitario":99}]'::jsonb) AS id_venta;
+ERROR:  Stock insuficiente para producto 6: disponible 0, solicitado 1
+CONTEXT:  PL/pgSQL function registrar_venta(character varying,integer,integer,jsonb) line 36 at RAISE
+Time: 6938.715 ms (00:06.939)
+COMMIT;
+ROLLBACK
+Time: 0.237 ms

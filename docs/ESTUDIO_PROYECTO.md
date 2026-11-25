@@ -7,7 +7,7 @@
 - **Repositorio:** `C:\Users\chant\ferreteria-pos`
 - **Base de datos (Docker):** `docker-compose.yml` (servicio `db`, imagen `postgres:18`, contenedor `ferreteria_db`, host `localhost:5433`, BD/usuario `ferreteria`, volumen `pgdata`, scripts montados en `/docker-entrypoint-initdb.d`).
 - **Scripts SQL:** `db/01_esquema.sql` (tablas núcleo, tipo compuesto, arreglos, JSONB), `db/02_herencia.sql` (INHERITS), `db/03_funciones.sql` (PL/pgSQL venta/traspaso), `db/04_triggers.sql` (bitácora), `db/05_vistas.sql`, `db/06_datos.sql` (semilla). Pruebas/notas: `db/pruebas/`.
-- **Backend API:** `app/backend/src` (`index.js`, `db/pool.js`, rutas en `routes/`: auth, productos, inventario, ventas, traspasos, reportes, banxico, sucursales).
+- **Backend API:** `app/backend/src` (`index.js`, `db/pool.js`, `middleware/auth.js` y rutas en `routes/`: auth, productos, inventario, ventas, traspasos, reportes, codigosPostales, sucursales).
 - **Frontend:** `app/frontend/src` (`App.jsx`, `api.js`, `main.jsx`, `styles.css`, `vite.config.js`).
 - **Documentación:** `docs/arquitectura.md`, `backlog.md`, `bitacora-ia.md`, `retrospectivas.md`, `manual_tecnico.md`, `manual_usuario.md`, `declaracion_ia.md`, `paso1_postgres_version.txt`.
 
@@ -29,7 +29,7 @@
 ## 4. Transacciones y concurrencia (U.IV BD)
 - **Mecanismo:** las funciones ejecutan dentro de una transacción; `SELECT ... FOR UPDATE` bloquea la fila de inventario hasta COMMIT/ROLLBACK, serializando accesos concurrentes al mismo producto/sucursal.
 - **Aislamiento:** PostgreSQL usa `READ COMMITTED` por defecto; el bloqueo de fila evita la sobreventa del “último artículo”. En escenarios más estrictos puede justificarse `SERIALIZABLE` con reintentos ante errores de serialización.
-- **Prueba (ejecutada):** `db/pruebas/concurrencia_ultimo_articulo.sql` — dos sesiones venden 1 unidad con stock=1 (producto 6, sucursal 1): una confirma, la otra falla con “Stock insuficiente…”, stock final 0 y nunca negativo. Salidas reales en `docs/evidencias/resumen_evidencias.md`; se recomienda capturar la pantalla de ambas sesiones.
+- **Prueba (ejecutada):** `db/pruebas/concurrencia_ultimo_articulo.sql` — dos sesiones venden 1 unidad con stock=1 (producto 6, sucursal 1): una confirma, la otra falla con “Stock insuficiente…”, stock final 0 y nunca negativo. Salidas reales en `docs/evidencias/resumen_evidencias.md` y captura `docs/evidencias/capturas/13-concurrencia-sesiones.png` (repetición `V-CONC-LIVE-A/B`).
 
 ## 5. Almacenamiento y consultas (U.III BD)
 - **EXPLAIN ANALYZE e índices:** `db/pruebas/explain_analisis.sql` (planes de existencias/búsqueda, creación de índice `idx_producto_nombre`, comparación y vista agregada). Ejecutado; planes reales en `docs/evidencias/explain_resultados.txt`.
@@ -55,11 +55,11 @@
 ## 8. Aplicación web (Programación Web U.I-IV)
 - **Arquitectura MVC/API (U.I, U.IV):** React (vista, puerto 5173, proxy `/api`) consume API REST Express (controladores/rutas, puerto 3001) que usa `pg` Pool hacia PostgreSQL. Flujo: evento DOM → fetch → ruta/controlador → SQL/PLpgSQL → JSON → actualización de vista.
 - **Frontend dinámico (U.II):** búsqueda en vivo de productos (efecto con retardo, sin recargar), carrito de venta (estado React, agrega/incrementa, total calculado), manipulación/renderizado del DOM por componentes; HTML semántico base y estilos simples (reforzar WCAG en el documento).
-- **Backend (U.III):** rutas Express, validación de entradas (campos requeridos, arreglos, valores), consumo de **API Banxico SIE** (`/api/banxico/tipo-cambio`, serie SF43718) con manejo de fallo/aviso si no hay token o la API no responde.
+- **Backend (U.III):** rutas Express, validación de entradas, middleware de sesión HMAC y roles, manejo centralizado de errores y consumo de la **API de códigos postales Postali** (`/api/codigos-postales/:cp`) con timeout y respuestas controladas 400/404/502/503. No requiere token.
 - **Frameworks (U.IV):** Express (routing, middlewares, JSON/CORS) y React+Vite (componentes, hooks, HMR/proxy). Redactar reportes de componentes e implementación MVC en el documento final.
 
 ## 9. API implementada (resumen)
-- `GET /api/health` estado BD; `POST /api/auth/login` login demo; `GET /api/productos?q=` catálogo/búsqueda; `GET /api/inventario?sucursal=` existencias (vista); `POST /api/ventas` registra venta (función PL/pgSQL); `POST /api/traspasos` registra traspaso; `GET /api/reportes/ventas-sucursal` y `/existencias-consolidado`; `GET /api/banxico/tipo-cambio`; `GET /api/sucursales`.
+- `GET /api/health` estado BD; `POST /api/auth/login` devuelve token HMAC; `GET/POST/PUT /api/productos`; `GET /api/inventario?sucursal=`; `POST /api/ventas`; `POST /api/traspasos`; `GET /api/reportes/ventas-sucursal` y `/existencias-consolidado` (administrador/gerente); `GET /api/codigos-postales/:cp`; `GET /api/sucursales`.
 
 ## 10. Diagrama relacional (Mermaid, base para tu diagrama formal)
 ```mermaid
@@ -98,11 +98,11 @@ Detalle completo con salidas reales en `docs/evidencias/resumen_evidencias.md`, 
 - **EXPLAIN/índices (U.III):** la vista de existencias usa `Index Scan` + `Bitmap Index Scan` + `Hash Join`; la búsqueda `ILIKE '%cemento%'` usa `Append`/`Seq Scan` en las tablas hijas incluso tras crear `idx_producto_nombre` (comodín inicial y herencia). Justificación documentada y propuesta de mejora con `pg_trgm`+GIN en hijas.
 - **Almacenamiento (U.III):** tras `ANALYZE`, `producto` (padre) tiene `relpages=0` (filas en hijas), hijas/inventario/venta/bitacora 1 página de 8192 bytes; TOAST en `producto` y `bitacora`; tablespaces `pg_default`/`pg_global`.
 - **Traspaso (U.II/U.IV):** `T-DEMO-01` movió 2 unidades de cemento de Cancún a Playa: stock 20→18 y 12→14, traspaso `completado` y eventos en bitácora (atómico).
-- **Banxico (Web U.III):** sin token responde `{"ok": false, "aviso": "BANXICO_TOKEN no configurado..."}` sin caerse. Configurar `BANXICO_TOKEN` en `app/backend/.env` para la consulta exitosa real.
+- **API externa (Web U.III):** `GET /api/codigos-postales/77500` respondió 200 con Quintana Roo, Benito Juárez y 16 asentamientos; `99999` → 404 y `abc` → 400. Sin token. Salida en `docs/evidencias/api_externa_resultados.txt` y capturas 09/10.
 - **PITR (U.IV):** clúster aparte `pitr_src`/`pitr_restore`; respaldo base de 31364 kB + 5 segmentos WAL archivados. Se recuperó al tiempo `2026-11-17 01:42:06.042778+00`: `pg_is_in_recovery = f` y solo filas 1 y 2; la fila 3 (posterior) no se recuperó. Evidencia en `docs/evidencias/pitr_resultados.txt`.
 - **BD distribuida (U.V):** nodos `dist_a` (5436), `dist_b` (5437) y `dist_replica` (5438) en la red `dist_net`. Particionamiento LIST con poda (`EXPLAIN` solo lee `venta_part_playa`), replicación streaming verificada con `pg_stat_replication` y fila visible en la réplica (`pg_is_in_recovery = t`), FDW de A hacia B, y 2PC con `traspaso_2pc_a2`/`traspaso_2pc_b2` visibles en `pg_prepared_xacts` y confirmadas en ambos nodos. Limitación real: `postgres_fdw` no soporta `PREPARE TRANSACTION` sobre tablas foráneas. Evidencia en `docs/evidencias/distribuida_resultados.txt`.
 - **Aprendizaje de ejecución:** el JSON del traspaso debe pasarse desde archivo SQL (`Get-Content -Raw ... | docker exec -i ... psql`) para evitar problemas de escape de comillas en PowerShell.
 
 
-- BD en Docker saludable (PG 18.6). Scripts `01`-`06` aplicados; tras corregir FKs por herencia: **3 sucursales, 8 usuarios, 6 productos, 12 registros de inventario**, 3 ventas (`V-CONC-A` + 2 de la UI), 1 traspaso (`T-DEMO-01`) y 24 eventos de bitácora. Producto 6 en sucursal 1 quedó en stock 0 tras la prueba de concurrencia.
-- Backend/Frontend: ejecutados en el equipo (backend :3001, frontend :5173); el alumno confirmó que el frontend funcionó sin errores. Faltan capturas de pantalla para el entregable.
+- BD en Docker saludable (PG 18.6). Scripts `01`-`06` aplicados; tras corregir FKs por herencia: **3 sucursales, 8 usuarios, 6 productos, 12 registros de inventario**, 4 ventas (`V-CONC-A`, 2 de la UI y `V-CONC-LIVE-A`), 1 traspaso (`T-DEMO-01`) y 28 eventos de bitácora. Producto 6 en sucursal 1 quedó en stock 0 tras la prueba de concurrencia.
+- Backend/Frontend ejecutados (backend :3001, frontend :5173); `npm run build` pasó. Hay 13 capturas reales en `docs/evidencias/capturas/`, 18/18 issues cerrados y el PDF final en `docs/entrega_word/`.

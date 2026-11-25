@@ -2,6 +2,7 @@
 const express = require('express'); // importa Express para crear el router
 const router = express.Router(); // crea una instancia de Router
 const pool = require('../db/pool'); // importa el pool de conexión a la base de datos
+const { firmar } = require('../middleware/auth'); // genera el token de sesión firmado
 
 // POST /api/auth/login - inicio de sesión básico por correo y contraseña (demo)
 // Nota: en un sistema real la contraseña se compara con hash (bcrypt) y se usa JWT/sesión.
@@ -20,10 +21,9 @@ router.post('/login', async (req, res) => { // define la ruta POST /login
       return res.status(401).json({ error: 'Credenciales inválidas' }); // responde no autorizado
     } // fin de verificación de credenciales
     const user = r.rows[0]; // toma el usuario encontrado
-    // Responde con los datos del usuario (en producción se devolvería un token)
-    res.json({ ok: true, usuario: user }); // envía usuario autenticado al cliente
+    res.json({ ok: true, usuario: user, token: firmar(user) }); // envía usuario y token de sesión al cliente
   } catch (err) { // captura errores de base de datos
-    res.status(500).json({ error: err.message }); // responde error interno
+    res.status(500).json({ error: 'No se pudo iniciar sesión' }); // responde error interno
   } // fin del try/catch
 }); // fin de la ruta POST /login
 

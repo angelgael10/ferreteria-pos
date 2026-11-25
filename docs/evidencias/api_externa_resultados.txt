@@ -1,0 +1,23 @@
+Evidencia real de API externa, sesion y roles - 2026-11-25 18:00
+Backend: http://localhost:3001 | Base: PostgreSQL 18 en localhost:5433
+
+GET /api/codigos-postales/77500 -> 200
+{"ok":true,"cp":"77500","estado":"Quintana Roo","municipio":"Benito Juárez","total":16,"asentamientos":[{"nombre":"Cancún Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Juárez","tipo":"Puerto","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Residencial La Cascada","tipo":"Condominio","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Supermanzana 1 Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Supermanzana 2 Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Supermanzana 20 Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Supermanzana 22 Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Supermanzana 23 Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"}]}
+
+GET /api/codigos-postales/99999 -> 404
+{"ok":false,"error":"Código postal no encontrado"}
+
+GET /api/codigos-postales/abc -> 400
+{"ok":false,"error":"El código postal debe tener 5 dígitos"}
+
+POST /api/auth/login [administrador] -> 200 rol=administrador token=eyJpZF91c3Vh...
+  GET /api/productos -> 200 filas=6
+  GET /api/reportes/ventas-sucursal -> 200 filas=3
+
+POST /api/auth/login [gerente] -> 200 rol=gerente token=eyJpZF91c3Vh...
+  GET /api/productos -> 200 filas=6
+  GET /api/reportes/ventas-sucursal -> 200 filas=3
+
+POST /api/auth/login [cajero] -> 200 rol=cajero token=eyJpZF91c3Vh...
+  GET /api/productos -> 200 filas=6
+  GET /api/reportes/ventas-sucursal -> 403 {"error":"Acceso denegado para el rol cajero"}

@@ -1,0 +1,4 @@
+  pid  | state  | wait_event_type |  wait_event   |                                          consulta
+-------+--------+-----------------+---------------+--------------------------------------------------------------------------------------------
+ 10385 | active | Lock            | transactionid | SELECT registrar_venta('V-CONC-LIVE-B', 1, 4, '[{"id_producto":6,"cantidad":1,"precio_unit
+(1 row)

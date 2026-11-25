@@ -1,23 +1,40 @@
-// routes/ventas.js - rutas para registrar y consultar ventas (POS)
-const express = require('express'); // importa Express
-const router = express.Router(); // crea el router
-const pool = require('../db/pool'); // importa el pool de PostgreSQL
+const express = require('express');
+const router = express.Router();
+const pool = require('../db/pool');
+const { requiereRol } = require('../middleware/auth');
 
-// POST /api/ventas - registra una venta usando la función PL/pgSQL registrar_venta
-router.post('/', async (req, res) => { // define ruta POST para crear venta
-  const { folio, id_sucursal, id_usuario, items } = req.body || {}; // extrae datos de la venta
-  // Valida campos obligatorios
-  if (!folio || !id_sucursal || !id_usuario || !Array.isArray(items) || items.length === 0) { // verifica datos mínimos
-    return res.status(400).json({ error: 'folio, id_sucursal, id_usuario e items son requeridos' }); // error de validación
-  } // fin de validación
-  try { // intenta registrar la venta
-    // Llama a la función transaccional que descuenta stock con FOR UPDATE y registra bitácora
-    const sql = 'SELECT registrar_venta($1, $2, $3, $4::jsonb) AS id_venta'; // consulta que invoca la función
-    const r = await pool.query(sql, [folio, id_sucursal, id_usuario, JSON.stringify(items)]); // ejecuta con parámetros
-    res.status(201).json({ ok: true, id_venta: r.rows[0].id_venta }); // responde con el id de la venta creada
-  } catch (err) { // captura errores (ej. stock insuficiente)
-    res.status(400).json({ error: err.message }); // responde el mensaje de error de la BD/validación
-  } // fin try/catch
-}); // fin POST /
+router.post('/', requiereRol('administrador', 'gerente', 'cajero'), async (req, res, next) => {
+  const { folio, id_sucursal, items } = req.body || {};
+  if (typeof folio !== 'string' || !folio.trim() || folio.length > 30) {
+    return res.status(400).json({ error: 'El folio es requerido y debe tener máximo 30 caracteres' });
+  }
+  if (!Number.isInteger(Number(id_sucursal)) || Number(id_sucursal) <= 0) {
+    return res.status(400).json({ error: 'La sucursal debe ser un identificador válido' });
+  }
+  if (!Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: 'El carrito debe contener al menos un producto' });
+  }
+  const ids = items.map((item) => Number(item.id_producto));
+  if (ids.some((id) => !Number.isInteger(id) || id <= 0) || items.some((item) => !Number.isInteger(Number(item.cantidad)) || Number(item.cantidad) <= 0)) {
+    return res.status(400).json({ error: 'Cada producto requiere un id y una cantidad mayor a cero' });
+  }
+  try {
+    const precios = await pool.query('SELECT id_producto, precio_mxn FROM producto WHERE id_producto = ANY($1::int[])', [ids]);
+    const mapa = new Map(precios.rows.map((row) => [row.id_producto, Number(row.precio_mxn)]));
+    const itemsSanitizados = items.map((item) => {
+      const id = Number(item.id_producto);
+      if (!mapa.has(id)) throw new Error(`Producto ${id} no existe`);
+      return { id_producto: id, cantidad: Number(item.cantidad), precio_unitario: mapa.get(id) };
+    });
+    const sql = 'SELECT registrar_venta($1, $2, $3, $4::jsonb) AS id_venta';
+    const r = await pool.query(sql, [folio.trim(), Number(id_sucursal), req.usuario.id_usuario, JSON.stringify(itemsSanitizados)]);
+    res.status(201).json({ ok: true, id_venta: r.rows[0].id_venta });
+  } catch (err) {
+    if (/no existe|Stock insuficiente/.test(err.message)) {
+      return res.status(400).json({ error: err.message });
+    }
+    next(err);
+  }
+});
 
-module.exports = router; // exporta el router
+module.exports = router;

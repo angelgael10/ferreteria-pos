@@ -40,10 +40,13 @@ Como negocio, quiero evitar la sobreventa del último artículo.
 - **Dado** una sola existencia y dos ventas simultáneas, **cuando** ambas intentan confirmar, **entonces** una se confirma y la otra se rechaza.
 - **Entonces** el stock nunca queda negativo.
 
-## HU-08 Tipo de cambio Banxico (Sprint 3)
-Como cajero, quiero ver el precio en dólares para cotizar.
-- **Dado** la API disponible, **cuando** consulto, **entonces** el sistema muestra el tipo de cambio de Banxico.
-- **Dado** que la API falla, **cuando** consulto, **entonces** se muestra aviso y el sistema no se cae.
+## HU-08 Consulta a API externa (Sprint 3)
+**Decisión final:** la historia se formuló originalmente con Banxico SIE, pero se sustituyó por la API de códigos postales Postali para tener una consulta real sin token. Issue #8 cerrado con ese criterio.
+
+Como cajero, quiero consultar datos externos para apoyar la venta.
+- **Dado** un código postal de 5 dígitos, **cuando** consulto, **entonces** el sistema muestra estado, municipio y asentamientos.
+- **Dado** un código inexistente o mal formado, **cuando** consulto, **entonces** el sistema responde 404 o 400 con un aviso y no se cae.
+- **Dado** que la API falla, **cuando** consulto, **entonces** se muestra un mensaje controlado (502/503).
 
 ## HU-09 Respaldo y recuperación PITR (Sprint 3)
 Como administrador, quiero respaldar y recuperar la base ante fallos.
@@ -52,3 +55,6 @@ Como administrador, quiero respaldar y recuperar la base ante fallos.
 ## HU-10 Reportes consolidados (Sprint 4)
 Como administrador, quiero reportes consolidados de todas las sucursales.
 - **Dado** datos en las tres sucursales, **cuando** genero el reporte, **entonces** suma ventas y existencias de todas.
+
+## Estado final
+Las 10 historias y las 8 tareas técnicas quedaron en **Done** en GitHub Projects (18/18 issues cerrados). Evidencia de acceptance en `docs/evidencias/` y `docs/evidencias/capturas/`.

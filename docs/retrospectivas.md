@@ -19,11 +19,11 @@
 - **Qué se logró:** PITR real con `pg_basebackup` + WAL (solo filas 1 y 2), particionamiento con poda, réplica streaming, FDW A→B y 2PC con dos transacciones preparadas; Banxico responde aviso controlado sin token.
 - **Qué funcionó bien:** las demostraciones en contenedores separados fueron reproducibles; la réplica mostró las filas del primario y `pg_prepared_xacts` evidenció el 2PC.
 - **Qué se puede mejorar:** el índice btree no se usa con `ILIKE '%...%'` y herencia; `postgres_fdw` no admite `PREPARE TRANSACTION`; `recovery.signal` debe existir antes del primer arranque.
-- **Acciones para el siguiente sprint:** capturas, token de Banxico, repositorio en GitHub y ensayo de la defensa.
+- **Acciones para el siguiente sprint:** capturas, sustituir Banxico por una API sin token, repositorio en GitHub y ensayo de la defensa.
 
 ## Sprint 4 – Cierre y defensa
-- **Objetivo:** reportes, pruebas, documentación final, presentación y cambio en vivo.
-- **Qué se logró:** reportes de ventas, manuales, `ESTUDIO_PROYECTO.md`, bitácora de IA con 8 entradas reales y evidencias guardadas en `docs/evidencias/`.
-- **Qué funcionó bien:** cada evidencia se generó ejecutando el sistema y documentando también los errores y su corrección.
-- **Qué se puede mejorar:** faltan capturas de pantalla y publicar el repositorio/tablero; conviene ensayar el cambio en vivo (por ejemplo, ajustar stock o crear una venta).
-- **Lecciones aprendidas:** no documentar resultados sin ejecutarlos; los fallos (BOM, comillas de PowerShell, `recovery.signal`, límite de FDW) son parte válida del aprendizaje y de la bitácora.
+- **Objetivo:** reportes, pruebas, documentación final, capturas, publicación y cambio en vivo.
+- **Qué se logró:** reportes con control de roles, sesión HMAC, API de códigos postales, 13 capturas reales, repetición de la concurrencia, 18/18 issues cerrados, README y documentación final.
+- **Qué funcionó bien:** cada evidencia se generó ejecutando el sistema y documentando también los errores y su corrección; `npm run build` del frontend pasó sin errores.
+- **Qué se puede mejorar:** la búsqueda `ILIKE '%...%'` podría optimizarse con `pg_trgm` en las tablas hijas; la bitácora duplica eventos por venta; conviene ensayar el cambio en vivo (ajustar stock o crear una venta).
+- **Lecciones aprendidas:** no documentar resultados sin ejecutarlos; los fallos (BOM, comillas de PowerShell, `recovery.signal`, límite de FDW y `sku` NULL al insertar en tablas hijas) son parte válida del aprendizaje y de la bitácora.

@@ -1,224 +1,679 @@
-// App.jsx - componente principal: navegación simple entre módulos (login, productos, inventario, POS, reportes)
-import { useEffect, useState } from 'react'; // importa hooks de estado y efecto de React
-import { api } from './api.js'; // importa la función auxiliar para llamar a la API
+import { useEffect, useState } from "react";
+import { api, guardarSesion, leerSesion, limpiarSesion } from "./api.js";
 
-// Componente principal de la aplicación
-export default function App() { // define y exporta el componente App
-  // Estados globales sencillos de la interfaz
-  const [usuario, setUsuario] = useState(null); // almacena el usuario autenticado (o null)
-  const [vista, setVista] = useState('login'); // controla qué vista/módulo se muestra
-  const [sucursal, setSucursal] = useState('1'); // sucursal seleccionada (por defecto Cancún=1)
-  const [mensaje, setMensaje] = useState(''); // mensaje informativo o de error
+const NOMBRES_SUCURSAL = { 1: "Cancún", 2: "Playa del Carmen", 3: "Chetumal" };
+const ROLES_CON_REPORTES = ["administrador", "gerente"];
+const formatoMXN = new Intl.NumberFormat("es-MX", {
+  style: "currency",
+  currency: "MXN",
+  minimumFractionDigits: 2,
+}).format;
 
-  // Maneja el cierre de sesión limpiando el usuario y regresando al login
-  function salir() { // función para cerrar sesión
-    setUsuario(null); // elimina el usuario autenticado
-    setVista('login'); // regresa a la vista de login
-    setMensaje(''); // limpia mensajes
-  } // fin de salir
+function BadgeStock({ stock, minimo }) {
+  const cantidad = Number(stock);
+  const minimoNumero = Number(minimo);
+  const agotado = cantidad <= 0;
+  const bajo = !agotado && cantidad <= minimoNumero;
+  const clase = agotado ? "badge-agotado" : bajo ? "badge-bajo" : "badge-ok";
+  const texto = agotado ? "Agotado" : bajo ? "Stock bajo" : "Disponible";
+  return <span className={`badge ${clase}`}>{texto}</span>;
+}
 
-  // Renderiza la barra de navegación cuando hay usuario autenticado
-  function Nav() { // componente interno de navegación
-    return ( // devuelve la barra de botones
-      <div className="barra"> {/* contenedor de botones de navegación */}
-        <button className="sec" onClick={() => setVista('productos')}>Productos</button> {/* ir a productos */}
-        <button className="sec" onClick={() => setVista('inventario')}>Inventario</button> {/* ir a inventario */}
-        <button className="sec" onClick={() => setVista('pos')}>Punto de venta</button> {/* ir a POS */}
-        <button className="sec" onClick={() => setVista('reportes')}>Reportes</button> {/* ir a reportes */}
-        <button className="sec" onClick={salir}>Salir</button> {/* cerrar sesión */}
-        <span>Usuario: {usuario?.nombre} ({usuario?.rol})</span> {/* muestra usuario actual */}
-      </div> // fin barra
-    ); // fin return Nav
-  } // fin Nav
+function ErrorDatos({ error, onReintentar }) {
+  if (!error) return null;
+  return (
+    <div className="alerta alerta-error" role="alert">
+      <span>{error}</span>
+      <button type="button" className="btn-mini" onClick={onReintentar}>
+        Reintentar
+      </button>
+    </div>
+  );
+}
 
-  // Renderiza la aplicación según el estado de autenticación y la vista seleccionada
-  return ( // devuelve la interfaz completa
-    <div className="contenedor"> {/* contenedor principal */}
-      <h2>Ferretería POS multisucursal</h2> {/* título de la aplicación */}
-      {mensaje && <p className="error">{mensaje}</p>} {/* muestra mensaje si existe */}
-      {!usuario ? ( // si no hay usuario autenticado
-        <Login onLogin={(u) => { setUsuario(u); setVista('productos'); }} setMensaje={setMensaje} /> // muestra login
-      ) : ( // si hay usuario autenticado
-        <>
-          <Nav /> {/* muestra navegación */}
-          <div className="card"> {/* selector de sucursal activo */}
-            <label>Sucursal: </label> {/* etiqueta del selector */}
-            <select value={sucursal} onChange={(e) => setSucursal(e.target.value)}> {/* selector de sucursal */}
-              <option value="1">Cancún</option> {/* opción Cancún */}
-              <option value="2">Playa del Carmen</option> {/* opción Playa */}
-              <option value="3">Chetumal</option> {/* opción Chetumal */}
-            </select> {/* fin select */}
-          </div> {/* fin card sucursal */}
-          {vista === 'productos' && <Productos />} {/* vista de productos/búsqueda */}
-          {vista === 'inventario' && <Inventario sucursal={sucursal} />} {/* vista de inventario */}
-          {vista === 'pos' && <POS sucursal={sucursal} usuario={usuario} />} {/* vista punto de venta */}
-          {vista === 'reportes' && <Reportes />} {/* vista de reportes */}
-        </> // fin fragmento autenticado
-      )} {/* fin condicional autenticación */}
-    </div> // fin contenedor
-  ); // fin return App
-} // fin componente App
+function Encabezado({ usuario }) {
+  return (
+    <header className="encabezado">
+      <div className="marca">
+        <div className="marca-icono" aria-hidden="true">F</div>
+        <div>
+          <h1>Ferretería POS multisucursal</h1>
+          <p className="subtitulo">
+            Inventario y punto de venta · Cancún, Playa del Carmen y Chetumal
+          </p>
+        </div>
+      </div>
+      {usuario && (
+        <div className="usuario-chip">
+          <strong>{usuario.nombre}</strong>
+          <span>{usuario.rol} · Sucursal {usuario.id_sucursal || "todas"}</span>
+        </div>
+      )}
+    </header>
+  );
+}
 
-// Componente de inicio de sesión (demo)
-function Login({ onLogin, setMensaje }) { // recibe callback de login y setter de mensaje
-  const [correo, setCorreo] = useState('cajero1.cancun@ferreteria.local'); // estado del correo
-  const [clave, setClave] = useState('hash_demo_cajero'); // estado de la clave (demo)
-  // Envía credenciales al backend para autenticar
-  async function enviar(e) { // manejador del submit
-    e.preventDefault(); // evita recarga de la página
-    setMensaje(''); // limpia mensajes previos
-    try { // intenta autenticar
-      const data = await api('/auth/login', { method: 'POST', body: JSON.stringify({ correo, clave }) }); // POST login
-      onLogin(data.usuario); // notifica usuario autenticado al componente padre
-    } catch (err) { // si falla la autenticación
-      setMensaje(err.message); // muestra el error
-    } // fin try/catch
-  } // fin enviar
-  return ( // formulario de login
-    <form className="card" onSubmit={enviar}> {/* tarjeta con formulario */}
-      <h3>Iniciar sesión</h3> {/* subtítulo */}
-      <div className="fila"> {/* fila de campos */}
-        <div className="col"> {/* columna correo */}
-          <label>Correo</label><br/> {/* etiqueta */}
-          <input value={correo} onChange={(e) => setCorreo(e.target.value)} /> {/* input correo */}
-        </div> {/* fin col */}
-        <div className="col"> {/* columna clave */}
-          <label>Clave</label><br/> {/* etiqueta */}
-          <input type="password" value={clave} onChange={(e) => setClave(e.target.value)} /> {/* input clave */}
-        </div> {/* fin col */}
-      </div> {/* fin fila */}
-      <p><button type="submit">Entrar</button></p> {/* botón enviar */}
-      <small>Demo: cajero1.cancun@ferreteria.local / hash_demo_cajero</small> {/* ayuda demo */}
-    </form> // fin form
-  ); // fin return
-} // fin Login
+function Login({ onLogin, setMensaje }) {
+  const [correo, setCorreo] = useState("");
+  const [clave, setClave] = useState("");
+  const [procesando, setProcesando] = useState(false);
 
-// Componente de catálogo/búsqueda en vivo de productos
-function Productos() { // lista y busca productos
-  const [q, setQ] = useState(''); // texto de búsqueda
-  const [items, setItems] = useState([]); // resultados de productos
-  // Efecto: busca productos cuando cambia el texto (búsqueda en vivo sin recargar)
-  useEffect(() => { // se ejecuta al montar y cuando cambia q
-    const t = setTimeout(async () => { // espera breve para no disparar en cada tecla inmediatamente
-      try { const data = await api('/productos?q=' + encodeURIComponent(q)); setItems(data); } catch { setItems([]); } // consulta API
-    }, 250); // retardo de 250ms
-    return () => clearTimeout(t); // limpia el temporizador al cambiar q
-  }, [q]); // dependencia: q
-  return ( // vista de productos
-    <div className="card"> {/* tarjeta */}
-      <h3>Catálogo de productos (búsqueda en vivo)</h3> {/* título */}
-      <input placeholder="Buscar por nombre, SKU o etiqueta" value={q} onChange={(e) => setQ(e.target.value)} /> {/* input búsqueda */}
-      <table> {/* tabla de resultados */}
-        <thead><tr><th>SKU</th><th>Nombre</th><th>Precio MXN</th><th>Tipo</th><th>Etiquetas</th></tr></thead> {/* encabezados */}
-        <tbody> {/* cuerpo de tabla */}
-          {items.map(p => ( // recorre productos
-            <tr key={p.id_producto}> {/* fila por producto */}
-              <td>{p.sku}</td><td>{p.nombre}</td><td>${p.precio_mxn}</td><td>{p.tipo_tabla}</td><td>{(p.etiquetas||[]).join(', ')}</td> {/* celdas */}
-            </tr> // fin fila
-          ))} {/* fin map */}
-        </tbody> {/* fin cuerpo */}
-      </table> {/* fin tabla */}
-    </div> // fin card
-  ); // fin return
-} // fin Productos
+  async function enviar(e) {
+    e.preventDefault();
+    setMensaje("");
+    setProcesando(true);
+    try {
+      const data = await api("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ correo, clave }),
+      });
+      onLogin(data);
+    } catch (err) {
+      setMensaje(err.message);
+    } finally {
+      setProcesando(false);
+    }
+  }
 
-// Componente de inventario por sucursal
-function Inventario({ sucursal }) { // recibe sucursal seleccionada
-  const [items, setItems] = useState([]); // existencias
-  // Carga inventario al montar y cuando cambia la sucursal
-  useEffect(() => { // efecto de carga
-    api('/inventario?sucursal=' + sucursal).then(setItems).catch(() => setItems([])); // consulta inventario
-  }, [sucursal]); // dependencia sucursal
-  return ( // vista inventario
-    <div className="card"> {/* tarjeta */}
-      <h3>Existencias por sucursal</h3> {/* título */}
-      <table> {/* tabla */}
-        <thead><tr><th>Sucursal</th><th>SKU</th><th>Producto</th><th>Stock</th><th>Mínimo</th></tr></thead> {/* encabezados */}
-        <tbody>{items.map((r,i)=>(<tr key={i}><td>{r.sucursal}</td><td>{r.sku}</td><td>{r.producto}</td><td>{r.stock}</td><td>{r.stock_minimo}</td></tr>))}</tbody> {/* filas */}
-      </table> {/* fin tabla */}
-    </div> // fin card
-  ); // fin return
-} // fin Inventario
+  return (
+    <form className="card login-card" onSubmit={enviar}>
+      <h3>Iniciar sesión</h3>
+      <p className="texto-ayuda">Accede con tu usuario para comenzar a vender.</p>
+      <div className="fila">
+        <div className="col">
+          <label htmlFor="correo">Correo</label>
+          <input id="correo" type="email" value={correo} autoComplete="username" onChange={(e) => setCorreo(e.target.value)} required />
+        </div>
+        <div className="col">
+          <label htmlFor="clave">Clave</label>
+          <input id="clave" type="password" value={clave} autoComplete="current-password" onChange={(e) => setClave(e.target.value)} required />
+        </div>
+      </div>
+      <button type="submit" disabled={procesando}>{procesando ? "Entrando..." : "Entrar"}</button>
+      <p className="demo">Demo: gerente.cancun@ferreteria.local / hash_demo_gerente</p>
+      <p className="demo">Cajero: cajero1.cancun@ferreteria.local / hash_demo_cajero</p>
+    </form>
+  );
+}
 
-// Componente de punto de venta con carrito
-function POS({ sucursal, usuario }) { // recibe sucursal y usuario
-  const [q, setQ] = useState(''); // búsqueda de producto
-  const [productos, setProductos] = useState([]); // resultados de búsqueda
-  const [carrito, setCarrito] = useState([]); // renglones del carrito
-  const [msg, setMsg] = useState(''); // mensaje de resultado
-  // Búsqueda en vivo de productos para agregar al carrito
-  useEffect(() => { // efecto de búsqueda
-    const t = setTimeout(async () => { // retardo
-      try { setProductos(q ? await api('/productos?q=' + encodeURIComponent(q)) : []); } catch { setProductos([]); } // busca
-    }, 250); // 250ms
-    return () => clearTimeout(t); // limpia
-  }, [q]); // depende de q
-  // Agrega un producto al carrito (cantidad 1 por defecto)
-  function agregar(p) { // función agregar
-    setCarrito(c => { // actualiza carrito
-      const ex = c.find(x => x.id_producto === p.id_producto); // busca si ya existe
-      if (ex) return c.map(x => x.id_producto===p.id_producto ? { ...x, cantidad: x.cantidad + 1 } : x); // incrementa cantidad
-      return [...c, { id_producto: p.id_producto, nombre: p.nombre, precio_unitario: Number(p.precio_mxn), cantidad: 1 }]; // agrega nuevo
-    }); // fin setCarrito
-  } // fin agregar
-  // Calcula el total del carrito
-  const total = carrito.reduce((s, r) => s + r.cantidad * r.precio_unitario, 0); // suma importes
-  // Envía la venta al backend
-  async function cobrar() { // función cobrar
-    setMsg(''); // limpia mensaje
-    try { // intenta registrar venta
-      const folio = 'V-' + Date.now(); // genera folio simple basado en tiempo
-      const items = carrito.map(r => ({ id_producto: r.id_producto, cantidad: r.cantidad, precio_unitario: r.precio_unitario })); // arma items
-      const data = await api('/ventas', { method: 'POST', body: JSON.stringify({ folio, id_sucursal: Number(sucursal), id_usuario: usuario.id_usuario, items }) }); // POST venta
-      setMsg('Venta registrada. ID: ' + data.id_venta); // mensaje de éxito
-      setCarrito([]); // vacía carrito
-    } catch (err) { // si falla (ej. stock insuficiente)
-      setMsg('Error: ' + err.message); // muestra error
-    } // fin try/catch
-  } // fin cobrar
-  return ( // vista POS
-    <div className="fila"> {/* dos columnas */}
-      <div className="col card"> {/* columna búsqueda */}
-        <h3>Buscar producto</h3> {/* título */}
-        <input placeholder="Nombre, SKU o etiqueta" value={q} onChange={(e) => setQ(e.target.value)} /> {/* input búsqueda */}
-        <ul> {/* lista de resultados */}
-          {productos.map(p => (<li key={p.id_producto}>{p.nombre} (${p.precio_mxn}) <button onClick={() => agregar(p)}>Agregar</button></li>))} {/* items */}
-        </ul> {/* fin lista */}
-      </div> {/* fin col */}
-      <div className="col card"> {/* columna carrito */}
-        <h3>Carrito</h3> {/* título */}
-        <table> {/* tabla carrito */}
-          <thead><tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Importe</th></tr></thead> {/* encabezados */}
-          <tbody>{carrito.map(r => (<tr key={r.id_producto}><td>{r.nombre}</td><td>{r.cantidad}</td><td>${r.precio_unitario}</td><td>${(r.cantidad*r.precio_unitario).toFixed(2)}</td></tr>))}</tbody> {/* filas */}
-        </table> {/* fin tabla */}
-        <p><strong>Total: ${total.toFixed(2)}</strong></p> {/* total */}
-        <button onClick={cobrar} disabled={!carrito.length}>Confirmar venta</button> {/* botón cobrar */}
-        {msg && <p>{msg}</p>} {/* mensaje resultado */}
-      </div> {/* fin col */}
-    </div> // fin fila
-  ); // fin return
-} // fin POS
+function Nav({ vista, setVista, puedeReportes, salir }) {
+  const opciones = [
+    { id: "productos", texto: "Productos" },
+    { id: "inventario", texto: "Inventario" },
+    { id: "pos", texto: "Punto de venta" },
+  ];
+  if (puedeReportes) opciones.push({ id: "reportes", texto: "Reportes" });
+  return (
+    <nav className="barra" aria-label="Navegación principal">
+      {opciones.map((opcion) => (
+        <button
+          key={opcion.id}
+          type="button"
+          className={vista === opcion.id ? "activo" : "sec"}
+          aria-current={vista === opcion.id ? "page" : undefined}
+          onClick={() => setVista(opcion.id)}
+        >
+          {opcion.texto}
+        </button>
+      ))}
+      <button type="button" className="sec" onClick={salir}>Salir</button>
+    </nav>
+  );
+}
 
-// Componente de reportes y tipo de cambio
-function Reportes() { // muestra reportes consolidados y tipo de cambio
-  const [ventas, setVentas] = useState([]); // ventas por sucursal
-  const [existencias, setExistencias] = useState([]); // existencias consolidadas
-  const [tc, setTc] = useState(null); // tipo de cambio
-  // Carga reportes y tipo de cambio al montar
-  useEffect(() => { // efecto inicial
-    api('/reportes/ventas-sucursal').then(setVentas).catch(()=>setVentas([])); // carga ventas
-    api('/reportes/existencias-consolidado').then(setExistencias).catch(()=>setExistencias([])); // carga existencias
-    api('/banxico/tipo-cambio').then(setTc).catch(()=>setTc({ok:false,aviso:'Error al consultar'})); // carga tipo de cambio
-  }, []); // solo al montar
-  return ( // vista reportes
-    <div className="card"> {/* tarjeta */}
-      <h3>Reportes</h3> {/* título */}
-      <h4>Tipo de cambio (Banxico)</h4> {/* subtítulo */}
-      {tc && (tc.ok ? <p className="ok">USD/MXN: {tc.valor} ({tc.fecha})</p> : <p className="error">{tc.aviso || 'No disponible'} {tc.detalle || ''}</p>)} {/* muestra tipo de cambio o aviso */}
-      <h4>Ventas por sucursal</h4> {/* subtítulo */}
-      <table><thead><tr><th>Sucursal</th><th># Ventas</th><th>Total vendido</th></tr></thead><tbody>{ventas.map(v=>(<tr key={v.id_sucursal}><td>{v.sucursal}</td><td>{v.numero_ventas}</td><td>${v.total_vendido}</td></tr>))}</tbody></table> {/* tabla ventas */}
-      <h4>Existencias consolidadas</h4> {/* subtítulo */}
-      <table><thead><tr><th>SKU</th><th>Producto</th><th>Stock total</th></tr></thead><tbody>{existencias.map(e=>(<tr key={e.id_producto}><td>{e.sku}</td><td>{e.producto}</td><td>{e.stock_total}</td></tr>))}</tbody></table> {/* tabla existencias */}
-    </div> // fin card
-  ); // fin return
-} // fin Reportes
+export default function App() {
+  const sesionInicial = leerSesion();
+  const [usuario, setUsuario] = useState(sesionInicial?.usuario || null);
+  const [vista, setVista] = useState(sesionInicial?.usuario ? "productos" : "login");
+  const [sucursal, setSucursal] = useState(String(sesionInicial?.usuario?.id_sucursal || 1));
+  const [sucursales, setSucursales] = useState([]);
+  const [mensaje, setMensaje] = useState("");
+
+  const puedeReportes = ROLES_CON_REPORTES.includes(usuario?.rol);
+
+  useEffect(() => {
+    if (sesionInicial?.usuario) {
+      api("/sucursales").then(setSucursales).catch(() => setSucursales([]));
+    }
+  }, []);
+
+  function salir() {
+    limpiarSesion();
+    setUsuario(null);
+    setVista("login");
+    setSucursal("1");
+    setMensaje("");
+  }
+
+  function nombreSucursal(id) {
+    const encontrada = sucursales.find((s) => String(s.id_sucursal) === String(id));
+    return encontrada?.nombre || NOMBRES_SUCURSAL[id] || `Sucursal ${id}`;
+  }
+
+  if (!usuario) {
+    return (
+      <div className="contenedor">
+        <Encabezado />
+        {mensaje && <p className="alerta alerta-error" role="alert">{mensaje}</p>}
+        <Login
+          setMensaje={setMensaje}
+          onLogin={(data) => {
+            guardarSesion(data.usuario, data.token);
+            setUsuario(data.usuario);
+            setSucursal(String(data.usuario.id_sucursal || 1));
+            setVista("productos");
+            setMensaje("");
+          }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="contenedor">
+      <Encabezado usuario={usuario} />
+      {mensaje && <p className="alerta alerta-error" role="alert">{mensaje}</p>}
+      <Nav vista={vista} setVista={setVista} puedeReportes={puedeReportes} salir={salir} />
+      <section className="card barra-sucursal">
+        <label htmlFor="sucursal">Sucursal activa</label>
+        <select id="sucursal" value={sucursal} onChange={(e) => setSucursal(e.target.value)}>
+          {(sucursales.length
+            ? sucursales
+            : Object.entries(NOMBRES_SUCURSAL).map(([id, nombre]) => ({ id_sucursal: id, nombre }))
+          ).map((s) => (
+            <option key={s.id_sucursal} value={s.id_sucursal}>{s.nombre}</option>
+          ))}
+        </select>
+        <span className="sucursal-actual">Vendiendo en: <strong>{nombreSucursal(sucursal)}</strong></span>
+      </section>
+      {vista === "productos" && <Productos puedeCrear={["administrador", "gerente"].includes(usuario.rol)} />}
+      {vista === "inventario" && <Inventario sucursal={sucursal} nombreSucursal={nombreSucursal} />}
+      {vista === "pos" && <POS sucursal={sucursal} nombreSucursal={nombreSucursal} />}
+      {vista === "reportes" && puedeReportes && <Reportes />}
+    </div>
+  );
+}
+
+function Productos({ puedeCrear }) {
+  const [q, setQ] = useState("");
+  const [items, setItems] = useState([]);
+  const [error, setError] = useState("");
+  const [intentos, setIntentos] = useState(0);
+  const [mostrarForm, setMostrarForm] = useState(false);
+  const [form, setForm] = useState({ sku: "", nombre: "", precio_mxn: "", tipo: "herramienta", etiquetas: "", descripcion: "" });
+  const [mensajeForm, setMensajeForm] = useState(null);
+
+  useEffect(() => {
+    let activo = true;
+    const t = setTimeout(async () => {
+      try {
+        const data = await api("/productos?q=" + encodeURIComponent(q));
+        if (activo) {
+          setItems(data);
+          setError("");
+        }
+      } catch (err) {
+        if (activo) {
+          setItems([]);
+          setError(err.message);
+        }
+      }
+    }, 250);
+    return () => {
+      activo = false;
+      clearTimeout(t);
+    };
+  }, [q, intentos]);
+
+  async function crear(e) {
+    e.preventDefault();
+    setMensajeForm(null);
+    try {
+      await api("/productos", {
+        method: "POST",
+        body: JSON.stringify({
+          ...form,
+          precio_mxn: Number(form.precio_mxn),
+          etiquetas: form.etiquetas.split(",").map((x) => x.trim()).filter(Boolean),
+        }),
+      });
+      setMensajeForm({ tipo: "ok", texto: "Producto creado correctamente." });
+      setForm({ sku: "", nombre: "", precio_mxn: "", tipo: "herramienta", etiquetas: "", descripcion: "" });
+      setIntentos((n) => n + 1);
+    } catch (err) {
+      setMensajeForm({ tipo: "error", texto: err.message });
+    }
+  }
+
+  return (
+    <section className="card">
+      <div className="card-header">
+        <div>
+          <h3>Catálogo de productos</h3>
+          <p className="texto-ayuda">Búsqueda en vivo por nombre, SKU o etiqueta.</p>
+        </div>
+        <div className="acciones-header">
+          <span className="contador">{items.length} resultado(s)</span>
+          {puedeCrear && (
+            <button type="button" className="sec" onClick={() => setMostrarForm((v) => !v)}>
+              {mostrarForm ? "Ocultar formulario" : "Nuevo producto"}
+            </button>
+          )}
+        </div>
+      </div>
+      <div>
+        <label htmlFor="buscar-productos">Buscar producto</label>
+        <input
+          id="buscar-productos"
+          className="buscador"
+          placeholder="Nombre, SKU o etiqueta"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
+      </div>
+      <ErrorDatos error={error} onReintentar={() => setIntentos((n) => n + 1)} />
+      {mostrarForm && puedeCrear && (
+        <form className="formulario-producto" onSubmit={crear}>
+          <div className="fila">
+            <div className="col">
+              <label htmlFor="nuevo-sku">SKU</label>
+              <input id="nuevo-sku" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} required />
+            </div>
+            <div className="col">
+              <label htmlFor="nuevo-nombre">Nombre</label>
+              <input id="nuevo-nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} required />
+            </div>
+            <div className="col">
+              <label htmlFor="nuevo-precio">Precio MXN</label>
+              <input id="nuevo-precio" type="number" min="0.01" step="0.01" value={form.precio_mxn} onChange={(e) => setForm({ ...form, precio_mxn: e.target.value })} required />
+            </div>
+            <div className="col">
+              <label htmlFor="nuevo-tipo">Tipo</label>
+              <select id="nuevo-tipo" value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })}>
+                <option value="herramienta">Herramienta</option>
+                <option value="material">Material</option>
+                <option value="electrico">Eléctrico</option>
+              </select>
+            </div>
+          </div>
+          <div className="fila">
+            <div className="col">
+              <label htmlFor="nuevo-etiquetas">Etiquetas (separadas por coma)</label>
+              <input id="nuevo-etiquetas" value={form.etiquetas} onChange={(e) => setForm({ ...form, etiquetas: e.target.value })} />
+            </div>
+            <div className="col">
+              <label htmlFor="nuevo-descripcion">Descripción</label>
+              <input id="nuevo-descripcion" value={form.descripcion} onChange={(e) => setForm({ ...form, descripcion: e.target.value })} />
+            </div>
+          </div>
+          <button type="submit">Guardar producto</button>
+          {mensajeForm && (
+            <p className={`alerta alerta-${mensajeForm.tipo}`} role={mensajeForm.tipo === "error" ? "alert" : "status"}>
+              {mensajeForm.texto}
+            </p>
+          )}
+        </form>
+      )}
+      {items.length === 0 && !error ? (
+        <p className="vacio">{q ? "No se encontraron productos con ese criterio." : "Escribe para buscar un producto."}</p>
+      ) : (
+        <div className="tabla-scroll">
+          <table>
+            <caption>Productos disponibles en el catálogo</caption>
+            <thead>
+              <tr>
+                <th scope="col">SKU</th>
+                <th scope="col">Nombre</th>
+                <th scope="col" className="numero">Precio MXN</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Etiquetas</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((p) => (
+                <tr key={p.id_producto}>
+                  <td>{p.sku}</td>
+                  <td>{p.nombre}</td>
+                  <td className="numero">{formatoMXN(Number(p.precio_mxn))}</td>
+                  <td>{p.tipo_tabla}</td>
+                  <td>{(p.etiquetas || []).map((etiqueta) => <span className="etiqueta" key={etiqueta}>{etiqueta}</span>)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function Inventario({ sucursal, nombreSucursal }) {
+  const [items, setItems] = useState([]);
+  const [error, setError] = useState("");
+  const [intentos, setIntentos] = useState(0);
+
+  useEffect(() => {
+    let activo = true;
+    api("/inventario?sucursal=" + sucursal)
+      .then((data) => {
+        if (activo) {
+          setItems(data);
+          setError("");
+        }
+      })
+      .catch((err) => {
+        if (activo) {
+          setItems([]);
+          setError(err.message);
+        }
+      });
+    return () => { activo = false; };
+  }, [sucursal, intentos]);
+
+  return (
+    <section className="card">
+      <div className="card-header">
+        <div>
+          <h3>Existencias por sucursal</h3>
+          <p className="texto-ayuda">Stock actual y mínimo configurado para {nombreSucursal(sucursal)}.</p>
+        </div>
+        <span className="contador">{items.length} registro(s)</span>
+      </div>
+      <ErrorDatos error={error} onReintentar={() => setIntentos((n) => n + 1)} />
+      {items.length === 0 && !error ? (
+        <p className="vacio">No hay existencias registradas para esta sucursal.</p>
+      ) : (
+        <div className="tabla-scroll">
+          <table>
+            <caption>Existencias de {nombreSucursal(sucursal)}</caption>
+            <thead>
+              <tr>
+                <th scope="col">Sucursal</th>
+                <th scope="col">SKU</th>
+                <th scope="col">Producto</th>
+                <th scope="col" className="numero">Stock</th>
+                <th scope="col" className="numero">Mínimo</th>
+                <th scope="col">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((r, i) => (
+                <tr key={i}>
+                  <td>{r.sucursal}</td>
+                  <td>{r.sku}</td>
+                  <td>{r.producto}</td>
+                  <td className="numero">{r.stock}</td>
+                  <td className="numero">{r.stock_minimo}</td>
+                  <td><BadgeStock stock={r.stock} minimo={r.stock_minimo} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function POS({ sucursal, nombreSucursal }) {
+  const [q, setQ] = useState("");
+  const [productos, setProductos] = useState([]);
+  const [errorBusqueda, setErrorBusqueda] = useState("");
+  const [carrito, setCarrito] = useState([]);
+  const [msg, setMsg] = useState(null);
+  const [procesando, setProcesando] = useState(false);
+
+  useEffect(() => {
+    let activo = true;
+    const t = setTimeout(async () => {
+      if (!q) {
+        setProductos([]);
+        setErrorBusqueda("");
+        return;
+      }
+      try {
+        const data = await api("/productos?q=" + encodeURIComponent(q));
+        if (activo) {
+          setProductos(data);
+          setErrorBusqueda("");
+        }
+      } catch (err) {
+        if (activo) {
+          setProductos([]);
+          setErrorBusqueda(err.message);
+        }
+      }
+    }, 250);
+    return () => {
+      activo = false;
+      clearTimeout(t);
+    };
+  }, [q]);
+
+  function agregar(p) {
+    setCarrito((actual) => {
+      const existente = actual.find((x) => x.id_producto === p.id_producto);
+      if (existente) {
+        return actual.map((x) => x.id_producto === p.id_producto ? { ...x, cantidad: x.cantidad + 1 } : x);
+      }
+      return [...actual, { id_producto: p.id_producto, nombre: p.nombre, precio_unitario: Number(p.precio_mxn), cantidad: 1 }];
+    });
+  }
+
+  function cambiarCantidad(idProducto, delta) {
+    setCarrito((actual) => actual
+      .map((r) => r.id_producto === idProducto ? { ...r, cantidad: r.cantidad + delta } : r)
+      .filter((r) => r.cantidad > 0));
+  }
+
+  function quitar(idProducto) {
+    setCarrito((actual) => actual.filter((r) => r.id_producto !== idProducto));
+  }
+
+  const total = carrito.reduce((suma, r) => suma + r.cantidad * r.precio_unitario, 0);
+
+  async function cobrar() {
+    if (procesando || !carrito.length) return;
+    setMsg(null);
+    setProcesando(true);
+    try {
+      const data = await api("/ventas", {
+        method: "POST",
+        body: JSON.stringify({
+          folio: "V-" + Date.now(),
+          id_sucursal: Number(sucursal),
+          items: carrito.map((r) => ({ id_producto: r.id_producto, cantidad: r.cantidad, precio_unitario: r.precio_unitario })),
+        }),
+      });
+      setMsg({ tipo: "ok", texto: "Venta registrada. ID: " + data.id_venta });
+      setCarrito([]);
+    } catch (err) {
+      setMsg({ tipo: "error", texto: err.message });
+    } finally {
+      setProcesando(false);
+    }
+  }
+
+  return (
+    <div className="pos-grid">
+      <section className="card">
+        <div className="card-header">
+          <div>
+            <h3>Buscar producto</h3>
+            <p className="texto-ayuda">Agrega artículos al carrito desde aquí.</p>
+          </div>
+        </div>
+        <label htmlFor="buscar-pos">Buscar productos para el carrito</label>
+        <input id="buscar-pos" className="buscador" placeholder="Nombre, SKU o etiqueta" value={q} onChange={(e) => setQ(e.target.value)} />
+        <ErrorDatos error={errorBusqueda} onReintentar={() => setQ((v) => v + " ")} />
+        {productos.length === 0 && !errorBusqueda ? (
+          <p className="vacio">{q ? "No hay productos que coincidan." : "Escribe para buscar un producto."}</p>
+        ) : (
+          <ul className="producto-lista">
+            {productos.map((p) => (
+              <li className="producto-item" key={p.id_producto}>
+                <div className="producto-info">
+                  <strong>{p.nombre}</strong>
+                  <small>{p.sku} · {p.tipo_tabla}</small>
+                </div>
+                <span className="producto-precio">{formatoMXN(Number(p.precio_mxn))}</span>
+                <button type="button" className="btn-mini" onClick={() => agregar(p)}>Agregar</button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+      <section className="card">
+        <div className="card-header">
+          <div>
+            <h3>Carrito</h3>
+            <p className="texto-ayuda">Sucursal: {nombreSucursal(sucursal)}</p>
+          </div>
+          <span className="contador">{carrito.length} artículo(s)</span>
+        </div>
+        {carrito.length === 0 ? (
+          <p className="vacio">El carrito está vacío. Busca un producto y agrégalo.</p>
+        ) : (
+          <div className="tabla-scroll">
+            <table className="tabla-carrito">
+              <caption>Resumen del carrito</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Producto</th>
+                  <th scope="col">Cantidad</th>
+                  <th scope="col" className="numero">Precio</th>
+                  <th scope="col" className="numero">Importe</th>
+                  <th scope="col">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {carrito.map((r) => (
+                  <tr key={r.id_producto}>
+                    <td>{r.nombre}</td>
+                    <td>
+                      <div className="control-cantidad">
+                        <button type="button" className="btn-cantidad" aria-label={`Quitar una unidad de ${r.nombre}`} onClick={() => cambiarCantidad(r.id_producto, -1)}>-</button>
+                        <span>{r.cantidad}</span>
+                        <button type="button" className="btn-cantidad" aria-label={`Agregar una unidad de ${r.nombre}`} onClick={() => cambiarCantidad(r.id_producto, 1)}>+</button>
+                      </div>
+                    </td>
+                    <td className="numero">{formatoMXN(r.precio_unitario)}</td>
+                    <td className="numero">{formatoMXN(r.cantidad * r.precio_unitario)}</td>
+                    <td><button type="button" className="btn-mini peligro" onClick={() => quitar(r.id_producto)}>Quitar</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <div className="total-caja"><span>Total</span><strong>{formatoMXN(total)}</strong></div>
+        {msg && <p className={`alerta alerta-${msg.tipo}`} role={msg.tipo === "error" ? "alert" : "status"}>{msg.texto}</p>}
+        <div className="acciones-carrito">
+          <button type="button" className="sec" onClick={() => setCarrito([])} disabled={!carrito.length || procesando}>Vaciar carrito</button>
+          <button type="button" onClick={cobrar} disabled={!carrito.length || procesando}>{procesando ? "Procesando..." : "Confirmar venta"}</button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Reportes() {
+  const [ventas, setVentas] = useState([]);
+  const [existencias, setExistencias] = useState([]);
+  const [errorVentas, setErrorVentas] = useState("");
+  const [errorExistencias, setErrorExistencias] = useState("");
+  const [intentos, setIntentos] = useState(0);
+  const [cp, setCp] = useState("77500");
+  const [postal, setPostal] = useState(null);
+  const [errorPostal, setErrorPostal] = useState("");
+  const [consultando, setConsultando] = useState(false);
+
+  useEffect(() => {
+    api("/reportes/ventas-sucursal").then((data) => { setVentas(data); setErrorVentas(""); }).catch((err) => setErrorVentas(err.message));
+    api("/reportes/existencias-consolidado").then((data) => { setExistencias(data); setErrorExistencias(""); }).catch((err) => setErrorExistencias(err.message));
+  }, [intentos]);
+
+  async function consultarCP(e) {
+    e.preventDefault();
+    setErrorPostal("");
+    setPostal(null);
+    if (!/^\d{5}$/.test(cp)) {
+      setErrorPostal("Escribe un código postal de 5 dígitos.");
+      return;
+    }
+    setConsultando(true);
+    try {
+      setPostal(await api("/codigos-postales/" + cp));
+    } catch (err) {
+      setErrorPostal(err.message);
+    } finally {
+      setConsultando(false);
+    }
+  }
+
+  return (
+    <div className="reportes-grid">
+      <section className="card reporte-card">
+        <h3>Consulta de código postal (servicio web externo)</h3>
+        <p className="texto-ayuda">Datos reales de SEPOMEX servidos por la API Postali, sin token.</p>
+        <form className="formulario-postal" onSubmit={consultarCP}>
+          <label htmlFor="cp">Código postal</label>
+          <input id="cp" inputMode="numeric" pattern="[0-9]{5}" maxLength="5" value={cp} onChange={(e) => setCp(e.target.value.replace(/\D/g, ""))} required />
+          <button type="submit" disabled={consultando}>{consultando ? "Consultando..." : "Consultar"}</button>
+        </form>
+        {errorPostal && <p className="alerta alerta-error" role="alert">{errorPostal}</p>}
+        {postal && (
+          <div className="postal-resultado" role="status">
+            <p><strong>{postal.cp}</strong> · {postal.estado} · {postal.municipio}</p>
+            <p className="texto-ayuda">{postal.total} asentamiento(s) encontrado(s)</p>
+            <ul className="lista-asentamientos">
+              {postal.asentamientos.map((a) => <li key={a.nombre}>{a.nombre} ({a.tipo})</li>)}
+            </ul>
+          </div>
+        )}
+      </section>
+      <section className="card reporte-card">
+        <h3>Ventas por sucursal</h3>
+        <ErrorDatos error={errorVentas} onReintentar={() => setIntentos((n) => n + 1)} />
+        {ventas.length === 0 && !errorVentas ? <p className="vacio">Sin ventas registradas.</p> : (
+          <div className="tabla-scroll">
+            <table>
+              <caption>Ventas consolidadas por sucursal</caption>
+              <thead><tr><th scope="col">Sucursal</th><th scope="col" className="numero"># Ventas</th><th scope="col" className="numero">Total vendido</th></tr></thead>
+              <tbody>
+                {ventas.map((v) => (
+                  <tr key={v.id_sucursal}>
+                    <td>{v.sucursal}</td>
+                    <td className="numero">{v.numero_ventas}</td>
+                    <td className="numero">{formatoMXN(Number(v.total_vendido))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+      <section className="card reporte-card">
+        <h3>Existencias consolidadas</h3>
+        <ErrorDatos error={errorExistencias} onReintentar={() => setIntentos((n) => n + 1)} />
+        {existencias.length === 0 && !errorExistencias ? <p className="vacio">Sin existencias registradas.</p> : (
+          <div className="tabla-scroll">
+            <table>
+              <caption>Stock total por producto en todas las sucursales</caption>
+              <thead><tr><th scope="col">SKU</th><th scope="col">Producto</th><th scope="col" className="numero">Stock total</th></tr></thead>
+              <tbody>
+                {existencias.map((e) => (
+                  <tr key={e.id_producto}>
+                    <td>{e.sku}</td>
+                    <td>{e.producto}</td>
+                    <td className="numero">{e.stock_total}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}

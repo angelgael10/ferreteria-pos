@@ -1,6 +1,6 @@
-# Evidencias ejecutadas (2026-11-17)
+# Evidencias ejecutadas (2026-11-17 y 2026-11-25)
 
-Resultados reales obtenidos al ejecutar el proyecto en el equipo del alumno (Docker `ferreteria_db`, PostgreSQL 18.6, host `localhost:5433`, BD `ferreteria`).
+Resultados reales obtenidos al ejecutar el proyecto en el equipo del alumno (Docker `ferreteria_db`, PostgreSQL 18.6, host `localhost:5433`, BD `ferreteria`). El 2026-11-25 se repitieron la concurrencia y las pruebas de API/roles con el frontend y backend finales.
 
 ## 1. Prueba de concurrencia (U.IV BD) — `db/pruebas/concurrencia_ultimo_articulo.sql`
 
@@ -27,6 +27,8 @@ Resultado final:
  V-CONC-A | 150.00 | completada
 ```
 Conclusión: con `READ COMMITTED` + `SELECT ... FOR UPDATE`, la segunda transacción espera a que se libere la fila, revalida el stock y se rechaza. **Una venta se confirma, la otra no, y el stock nunca queda negativo.**
+
+Repetición con el sistema final (2026-11-25): se ajustó el producto 6/sucursal 1 a stock 1 y se ejecutaron dos sesiones reales. La sesión A confirmó `V-CONC-LIVE-A`; la sesión B quedó en `state = active`, `wait_event_type = Lock`, `wait_event = transactionid` y luego falló con `ERROR: Stock insuficiente para producto 6: disponible 0, solicitado 1`, seguido de `ROLLBACK`. Salidas completas: `live_concurrencia_a.txt`, `live_concurrencia_b.txt`, `live_concurrencia_lock.txt`, `live_concurrencia_final.txt` y captura `capturas/13-concurrencia-sesiones.png`. Stock final verificado: 0.
 
 > Nota: en la bitácora aparecen dos eventos por venta: uno del trigger `trg_venta_bitacora` (`INSERT`) y otro de la función (`VENTA`). Es auditoría redundante intencional; puede unificarse si se requiere.
 
@@ -86,16 +88,17 @@ Bitácora: eventos `UPDATE` de inventario en origen/destino y `TRASPASO` con id 
 
 > Nota de ejecución: los dos primeros intentos fallaron por el escapado de comillas JSON en PowerShell; se corrigió pasando el SQL desde un archivo (`Get-Content -Raw archivo.sql | docker exec -i ... psql`). Queda documentado como aprendizaje real.
 
-## 4. Consumo de API externa Banxico (Web U.III)
+## 4. Consumo de API externa (Web U.III)
 
-Prueba real sin token (`/api/banxico/tipo-cambio`):
+Decisión final: la historia original pedía Banxico SIE, pero se sustituyó por la API de códigos postales Postali para obtener una respuesta real sin token.
+
+Prueba real (`GET /api/codigos-postales/77500`):
 ```json
-{
-  "ok": false,
-  "aviso": "BANXICO_TOKEN no configurado. Configura el token para consultar el tipo de cambio."
-}
+{"ok":true,"cp":"77500","estado":"Quintana Roo","municipio":"Benito Juárez","total":16,"asentamientos":[{"nombre":"Cancún Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"}]}
 ```
-Conclusión: el sistema **no se cae** si falta el token o la API falla; muestra un aviso controlado. Para la evidencia de consumo exitoso, registrar un token gratuito en Banxico SIE y colocarlo en `app/backend/.env` como `BANXICO_TOKEN=...`, reiniciar el backend y capturar la respuesta con `fecha` y `valor`.
+Casos de error verificados: `99999` → 404 `Código postal no encontrado`; `abc` → 400 `El código postal debe tener 5 dígitos`. Salida completa en `api_externa_resultados.txt`; capturas `09-api-codigo-postal.png` y `10-api-cp-error.png`.
+
+El backend nunca expone la URL directamente al navegador: la ruta Express valida, aplica timeout de 8 s y normaliza errores 502/503. Conclusión: el sistema **no se cae** si la API falla ni requiere credenciales externas.
 
 ## 5. Recuperación a un punto en el tiempo — PITR (U.IV BD)
 
@@ -123,9 +126,10 @@ Demostración con tres contenedores PostgreSQL 18.6 en la red Docker `dist_net`;
 - **2PC:** `traspaso_2pc_a2` (nodo A) y `traspaso_2pc_b2` (nodo B) visibles en `pg_prepared_xacts`; después `COMMIT PREPARED` en ambos y filas 502 verificadas.
 - **Limitación real:** `postgres_fdw` no permite `PREPARE TRANSACTION` sobre tablas foráneas (`cannot PREPARE a transaction that has operated on postgres_fdw foreign tables`); el 2PC se hizo con dos transacciones preparadas explícitas (coordinador manual).
 
-## 7. Capturas pendientes por el alumno (reales)
-- Pantallas del frontend: login, búsqueda en vivo, inventario por sucursal, POS con carrito y venta confirmada, reportes y aviso de Banxico.
-- Sesiones de la prueba de concurrencia (A esperando/COMMIT, B rechazada) — ya generadas en terminal; tomar captura.
-- `EXPLAIN ANALYZE` y consultas de almacenamiento (salidas ya guardadas en `docs/evidencias/`).
-- Traspaso antes/después, PITR y BD distribuida (salidas reales ya guardadas en `docs/evidencias/`).
-- Repositorio en GitHub con ramas/commits y tablero del proyecto.
+## 7. Capturas y evidencias finales (2026-11-25)
+- `capturas/01-login.png` a `capturas/12-github-repo.png`: login, catálogo, búsqueda en vivo, formulario de producto, inventario, POS, carrito, reportes, API postal, error de CP, vista móvil y repositorio.
+- `capturas/13-concurrencia-sesiones.png`: salidas reales de las dos sesiones, el bloqueo en `pg_stat_activity` y la verificación final.
+- `api_externa_resultados.txt`: respuesta 200/404/400 y comprobación de roles (administrador y gerente acceden a reportes; cajero recibe 403).
+- `live_concurrencia_*.txt`: transcripciones de la repetición de concurrencia.
+- `explain_resultados.txt`, `almacenamiento_resultados.txt`, `traspaso_resultados.txt`, `pitr_resultados.txt` y `distribuida_resultados.txt`: evidencias de ejecuciones anteriores, ya incorporadas al documento final.
+- Estado GitHub: 18/18 issues cerrados y tablero con 18 tarjetas en Done.

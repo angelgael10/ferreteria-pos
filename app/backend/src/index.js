@@ -12,7 +12,7 @@ const inventarioRoutes = require('./routes/inventario'); // rutas de inventario 
 const ventasRoutes = require('./routes/ventas'); // rutas de punto de venta/ventas
 const traspasosRoutes = require('./routes/traspasos'); // rutas de traspasos entre sucursales
 const reportesRoutes = require('./routes/reportes'); // rutas de reportes
-const banxicoRoutes = require('./routes/banxico'); // rutas para consultar tipo de cambio (API externa)
+const codigosPostalesRoutes = require('./routes/codigosPostales'); // rutas para consultar códigos postales (API externa)
 const sucursalesRoutes = require('./routes/sucursales'); // rutas para listar sucursales
 
 const app = express(); // crea la aplicación Express
@@ -39,8 +39,13 @@ app.use('/api/inventario', inventarioRoutes); // monta rutas de inventario
 app.use('/api/ventas', ventasRoutes); // monta rutas de ventas
 app.use('/api/traspasos', traspasosRoutes); // monta rutas de traspasos
 app.use('/api/reportes', reportesRoutes); // monta rutas de reportes
-app.use('/api/banxico', banxicoRoutes); // monta rutas de tipo de cambio
+app.use('/api/codigos-postales', codigosPostalesRoutes); // monta rutas de códigos postales
 app.use('/api/sucursales', sucursalesRoutes); // monta rutas de sucursales
+
+app.use((err, req, res, next) => {
+  console.error('Error no controlado:', err.message);
+  res.status(err.status || 500).json({ error: err.expose ? err.message : 'Error interno del servidor' });
+});
 
 // Middleware básico de manejo de rutas no encontradas
 app.use((req, res) => { // se ejecuta si ninguna ruta anterior coincidió

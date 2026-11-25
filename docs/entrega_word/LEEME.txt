@@ -1,0 +1,45 @@
+CARPETA DE ENTREGA - PROYECTO FERRETERÍA POS
+=============================================
+
+Archivo principal:
+- Trabajo_realizado_ferreteria_POS.pdf
+
+El PDF incluye portada, introducción, objetivos, alcance y criterios de
+aceptación, backlog y sprints con burndown y retrospectivas, desarrollo por
+materia/unidad con evidencias, pruebas y resultados, conclusiones,
+referencias IEEE [1] y [2], y anexos (manual técnico, manual de usuario,
+declaración de IA y bitácora de IA con 10 interacciones).
+
+Capturas reales (docs/evidencias/capturas):
+- 01-login.png
+- 02-productos.png
+- 03-busqueda-en-vivo.png
+- 04-formulario-producto.png
+- 05-inventario.png
+- 06-pos-busqueda.png
+- 07-pos-carrito.png
+- 08-reportes.png
+- 09-api-codigo-postal.png
+- 10-api-cp-error.png
+- 11-login-movil.png
+- 12-github-repo.png
+- 13-concurrencia-sesiones.png
+
+Evidencias de ejecución (docs/evidencias):
+- api_externa_resultados.txt
+- live_concurrencia_a.txt
+- live_concurrencia_b.txt
+- live_concurrencia_lock.txt
+- live_concurrencia_final.txt
+- resumen_evidencias.md
+- explain_resultados.txt
+- almacenamiento_resultados.txt
+- traspaso_resultados.txt
+- pitr_resultados.txt
+- distribuida_resultados.txt
+
+Enlaces:
+- Repositorio: https://github.com/angelgael10/ferreteria-pos
+- Tablero: https://github.com/users/angelgael10/projects/1
+
+Estado: 18/18 issues cerrados, capturas actualizadas y cambios publicados.

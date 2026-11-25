@@ -41,6 +41,7 @@ function Encabezado({ usuario }) {
           <p className="subtitulo">
             Inventario y punto de venta · Cancún, Playa del Carmen y Chetumal
           </p>
+          <p className="folio-linea">SERIE 2026 · HOJA 01 · MOSTRADOR MULTISUCURSAL</p>
         </div>
       </div>
       {usuario && (
@@ -77,6 +78,7 @@ function Login({ onLogin, setMensaje }) {
 
   return (
     <form className="card login-card" onSubmit={enviar}>
+      <span className="eyebrow">00 / Acceso al mostrador</span>
       <h3>Iniciar sesión</h3>
       <p className="texto-ayuda">Accede con tu usuario para comenzar a vender.</p>
       <div className="fila">
@@ -105,7 +107,7 @@ function Nav({ vista, setVista, puedeReportes, salir }) {
   if (puedeReportes) opciones.push({ id: "reportes", texto: "Reportes" });
   return (
     <nav className="barra" aria-label="Navegación principal">
-      {opciones.map((opcion) => (
+      {opciones.map((opcion, i) => (
         <button
           key={opcion.id}
           type="button"
@@ -113,10 +115,11 @@ function Nav({ vista, setVista, puedeReportes, salir }) {
           aria-current={vista === opcion.id ? "page" : undefined}
           onClick={() => setVista(opcion.id)}
         >
+          <span className="nav-num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
           {opcion.texto}
         </button>
       ))}
-      <button type="button" className="sec" onClick={salir}>Salir</button>
+      <button type="button" className="sec salir" onClick={salir}>Salir</button>
     </nav>
   );
 }
@@ -249,6 +252,7 @@ function Productos({ puedeCrear }) {
     <section className="card">
       <div className="card-header">
         <div>
+          <span className="eyebrow">01 / Mostrador</span>
           <h3>Catálogo de productos</h3>
           <p className="texto-ayuda">Búsqueda en vivo por nombre, SKU o etiqueta.</p>
         </div>
@@ -374,6 +378,7 @@ function Inventario({ sucursal, nombreSucursal }) {
     <section className="card">
       <div className="card-header">
         <div>
+          <span className="eyebrow">02 / Almacén</span>
           <h3>Existencias por sucursal</h3>
           <p className="texto-ayuda">Stock actual y mínimo configurado para {nombreSucursal(sucursal)}.</p>
         </div>
@@ -499,6 +504,7 @@ function POS({ sucursal, nombreSucursal }) {
       <section className="card">
         <div className="card-header">
           <div>
+            <span className="eyebrow">03 / Venta · búsqueda</span>
             <h3>Buscar producto</h3>
             <p className="texto-ayuda">Agrega artículos al carrito desde aquí.</p>
           </div>
@@ -526,6 +532,7 @@ function POS({ sucursal, nombreSucursal }) {
       <section className="card">
         <div className="card-header">
           <div>
+            <span className="eyebrow">03 / Venta · cobro</span>
             <h3>Carrito</h3>
             <p className="texto-ayuda">Sucursal: {nombreSucursal(sucursal)}</p>
           </div>
@@ -614,7 +621,8 @@ function Reportes() {
   return (
     <div className="reportes-grid">
       <section className="card reporte-card">
-        <h3>Consulta de código postal (servicio web externo)</h3>
+        <span className="eyebrow">04 / Servicio externo</span>
+        <h3>Consulta de código postal</h3>
         <p className="texto-ayuda">Datos reales de SEPOMEX servidos por la API Postali, sin token.</p>
         <form className="formulario-postal" onSubmit={consultarCP}>
           <label htmlFor="cp">Código postal</label>
@@ -633,6 +641,7 @@ function Reportes() {
         )}
       </section>
       <section className="card reporte-card">
+        <span className="eyebrow">04 / Ventas</span>
         <h3>Ventas por sucursal</h3>
         <ErrorDatos error={errorVentas} onReintentar={() => setIntentos((n) => n + 1)} />
         {ventas.length === 0 && !errorVentas ? <p className="vacio">Sin ventas registradas.</p> : (
@@ -654,6 +663,7 @@ function Reportes() {
         )}
       </section>
       <section className="card reporte-card">
+        <span className="eyebrow">04 / Stock total</span>
         <h3>Existencias consolidadas</h3>
         <ErrorDatos error={errorExistencias} onReintentar={() => setIntentos((n) => n + 1)} />
         {existencias.length === 0 && !errorExistencias ? <p className="vacio">Sin existencias registradas.</p> : (

@@ -21,6 +21,7 @@ Proyecto integrador (Programación Web + Bases de Datos). Sucursales: Cancún, P
 - `docs/` arquitectura, backlog, retrospectivas, bitácora IA, manuales y evidencias
 - `docs/evidencias/capturas/` capturas reales del frontend y de la concurrencia
 - `docs/entrega_word/` documento final PDF y material de apoyo
+- `docs/presentacion/` presentación para defensa con marcadores de capturas en las notas
 
 ## Requisitos
 - Docker Desktop
@@ -68,6 +69,6 @@ El login devuelve un token HMAC con vigencia de 8 horas. Los reportes solo está
 Detalle en `docs/evidencias/resumen_evidencias.md`, `api_externa_resultados.txt`, `live_concurrencia_*.txt` y `capturas/`.
 
 ## Entregable
-- Documento: `docs/entrega_word/Trabajo_realizado_ferreteria_POS.pdf`
+- Documento: [Trabajo_realizado_ferreteria_POS.pdf](docs/entrega_word/Trabajo_realizado_ferreteria_POS.pdf)
+- Presentación: [Defensa_ferreteria_POS.pptx](docs/presentacion/Defensa_ferreteria_POS.pptx)
 - Código y evidencias: este repositorio.
-- Presentación: no incluida a petición del alumno.

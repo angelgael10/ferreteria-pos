@@ -2,9 +2,13 @@ const express = require('express');
 const router = express.Router();
 const BASE = (process.env.POSTAL_API_BASE || 'https://postali.app').replace(/\/$/, '');
 
+function validarCP(cp) {
+  return /^\d{5}$/.test(String(cp));
+}
+
 router.get('/:cp', async (req, res) => {
   const cp = req.params.cp;
-  if (!/^\d{5}$/.test(cp)) {
+  if (!validarCP(cp)) {
     return res.status(400).json({ ok: false, error: 'El código postal debe tener 5 dígitos' });
   }
   try {
@@ -40,3 +44,4 @@ router.get('/:cp', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.validarCP = validarCP;

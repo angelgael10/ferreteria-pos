@@ -2,6 +2,8 @@
 
 Resultados reales obtenidos al ejecutar el proyecto en el equipo del alumno (Docker `ferreteria_db`, PostgreSQL 18.6, host `localhost:5433`, BD `ferreteria`). El 2026-11-25 se repitieron la concurrencia y las pruebas de API/roles con el frontend y backend finales.
 
+Evidencias de producto añadidas para cerrar la rúbrica: `producto_pw_normativa_dom.md`, `producto_pw_componentes_mvc.md`, `producto_bd_motor_conjuntos.md` y `guion_demo_vivo.md`. Las pruebas mínimas del backend están en `app/backend/tests/auth.test.js` y se ejecutan con `npm test`.
+
 ## 1. Prueba de concurrencia (U.IV BD) — `db/pruebas/concurrencia_ultimo_articulo.sql`
 
 Escenario: producto 6 (`ELE-002`) en sucursal 1 (Cancún) con **stock = 1**. Dos sesiones:

@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { api, guardarSesion, leerSesion, limpiarSesion } from "./api.js";
 
-const NOMBRES_SUCURSAL = { 1: "Cancún", 2: "Playa del Carmen", 3: "Chetumal" };
+const NOMBRES_SUCURSAL = {
+  1: "Ferretería Cancún Centro",
+  2: "Ferretería Playa Centro",
+  3: "Ferretería Chetumal Centro",
+};
 const ROLES_CON_REPORTES = ["administrador", "gerente"];
 const formatoMXN = new Intl.NumberFormat("es-MX", {
   style: "currency",
@@ -135,10 +139,29 @@ export default function App() {
   const puedeReportes = ROLES_CON_REPORTES.includes(usuario?.rol);
 
   useEffect(() => {
-    if (sesionInicial?.usuario) {
+    if (!sesionInicial?.token) return;
+    let activo = true;
+    api("/auth/me")
+      .then((data) => {
+        if (!activo) return;
+        guardarSesion(data.usuario, sesionInicial.token);
+        setUsuario(data.usuario);
+        setSucursal(String(data.usuario.id_sucursal || 1));
+      })
+      .catch(() => {
+        if (activo) {
+          setUsuario(null);
+          setVista("login");
+        }
+      });
+    return () => { activo = false; };
+  }, []);
+
+  useEffect(() => {
+    if (usuario) {
       api("/sucursales").then(setSucursales).catch(() => setSucursales([]));
     }
-  }, []);
+  }, [usuario]);
 
   function salir() {
     limpiarSesion();
@@ -155,45 +178,51 @@ export default function App() {
 
   if (!usuario) {
     return (
-      <div className="contenedor">
-        <Encabezado />
-        {mensaje && <p className="alerta alerta-error" role="alert">{mensaje}</p>}
-        <Login
-          setMensaje={setMensaje}
-          onLogin={(data) => {
-            guardarSesion(data.usuario, data.token);
-            setUsuario(data.usuario);
-            setSucursal(String(data.usuario.id_sucursal || 1));
-            setVista("productos");
-            setMensaje("");
-          }}
-        />
-      </div>
+      <>
+        <a className="salto" href="#contenido">Ir al contenido principal</a>
+        <main className="contenedor" id="contenido">
+          <Encabezado />
+          {mensaje && <p className="alerta alerta-error" role="alert">{mensaje}</p>}
+          <Login
+            setMensaje={setMensaje}
+            onLogin={(data) => {
+              guardarSesion(data.usuario, data.token);
+              setUsuario(data.usuario);
+              setSucursal(String(data.usuario.id_sucursal || 1));
+              setVista("productos");
+              setMensaje("");
+            }}
+          />
+        </main>
+      </>
     );
   }
 
   return (
-    <div className="contenedor">
-      <Encabezado usuario={usuario} />
-      {mensaje && <p className="alerta alerta-error" role="alert">{mensaje}</p>}
-      <Nav vista={vista} setVista={setVista} puedeReportes={puedeReportes} salir={salir} />
-      <section className="card barra-sucursal">
-        <label htmlFor="sucursal">Sucursal activa</label>
-        <select id="sucursal" value={sucursal} onChange={(e) => setSucursal(e.target.value)}>
-          {(sucursales.length
-            ? sucursales
-            : Object.entries(NOMBRES_SUCURSAL).map(([id, nombre]) => ({ id_sucursal: id, nombre }))
-          ).map((s) => (
-            <option key={s.id_sucursal} value={s.id_sucursal}>{s.nombre}</option>
-          ))}
-        </select>
-        <span className="sucursal-actual">Vendiendo en: <strong>{nombreSucursal(sucursal)}</strong></span>
-      </section>
-      {vista === "productos" && <Productos puedeCrear={["administrador", "gerente"].includes(usuario.rol)} />}
-      {vista === "inventario" && <Inventario sucursal={sucursal} nombreSucursal={nombreSucursal} />}
-      {vista === "pos" && <POS sucursal={sucursal} nombreSucursal={nombreSucursal} />}
-      {vista === "reportes" && puedeReportes && <Reportes />}
-    </div>
+    <>
+      <a className="salto" href="#contenido">Ir al contenido principal</a>
+      <main className="contenedor" id="contenido">
+        <Encabezado usuario={usuario} />
+        {mensaje && <p className="alerta alerta-error" role="alert">{mensaje}</p>}
+        <Nav vista={vista} setVista={setVista} puedeReportes={puedeReportes} salir={salir} />
+        <section className="card barra-sucursal">
+          <label htmlFor="sucursal">Sucursal activa</label>
+          <select id="sucursal" value={sucursal} onChange={(e) => setSucursal(e.target.value)}>
+            {(sucursales.length
+              ? sucursales
+              : Object.entries(NOMBRES_SUCURSAL).map(([id, nombre]) => ({ id_sucursal: id, nombre }))
+            ).map((s) => (
+              <option key={s.id_sucursal} value={s.id_sucursal}>{s.nombre}</option>
+            ))}
+          </select>
+          <span className="sucursal-actual">Vendiendo en: <strong>{nombreSucursal(sucursal)}</strong></span>
+        </section>
+        {vista === "productos" && <Productos puedeCrear={["administrador", "gerente"].includes(usuario.rol)} />}
+        {vista === "inventario" && <Inventario sucursal={sucursal} nombreSucursal={nombreSucursal} />}
+        {vista === "pos" && <POS sucursal={sucursal} nombreSucursal={nombreSucursal} />}
+        {vista === "reportes" && puedeReportes && <Reportes />}
+      </main>
+    </>
   );
 }
 

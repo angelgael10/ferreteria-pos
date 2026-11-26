@@ -15,7 +15,7 @@
    docker compose up -d
    docker compose ps
    ```
-   Los scripts `db/01`-`06` se montan en `/docker-entrypoint-initdb.d`; para repetirlos manualmente se ejecutan en orden con `psql`.
+   Los scripts `db/01`-`07` se montan en `/docker-entrypoint-initdb.d`; para repetirlos manualmente se ejecutan en orden con `psql`.
 5. Backend:
    ```bash
    cd app/backend
@@ -29,6 +29,7 @@
    npm run dev
    ```
 7. Verificación de producción del frontend: `npm run build` en `app/frontend`.
+8. Pruebas mínimas del backend: `npm test` en `app/backend` (token HMAC, roles y validación de código postal).
 
 ## 3. Arquitectura
 Patrón API/MVC: React (vista) → Express (rutas/middlewares) → PostgreSQL (funciones PL/pgSQL y vistas). El proxy de Vite redirige `/api` al puerto 3001.
@@ -43,6 +44,7 @@ Patrón API/MVC: React (vista) → Express (rutas/middlewares) → PostgreSQL (f
 - Tablas: sucursal, usuario, producto (con herencia a herramienta/material/eléctrico), inventario, venta, venta_detalle, traspaso, traspaso_detalle y bitacora.
 - Funciones: `registrar_venta` y `registrar_traspaso`, con `SELECT ... FOR UPDATE` para evitar sobreventa.
 - Vistas: `v_existencias_sucursal`, `v_existencias_consolidado` y `v_ventas_por_sucursal`.
+- Los textos acentuados del seed usan literales `U&'...'` y `SET client_encoding = 'UTF8'`; `db/07_correcion_texto.sql` corrige una base ya inicializada.
 
 ## 5. Componentes del framework
 - **Express:** enrutamiento, `express.json()`, CORS, middlewares de sesión/roles y manejo centralizado de errores.
@@ -51,7 +53,7 @@ Patrón API/MVC: React (vista) → Express (rutas/middlewares) → PostgreSQL (f
 
 ## 6. Operación y pruebas
 - Salud: `GET /api/health`.
-- Login: `POST /api/auth/login` devuelve `{ ok, usuario, token }`.
+- Login: `POST /api/auth/login` devuelve `{ ok, usuario, token }`; `GET /api/auth/me` devuelve el usuario vigente desde la base de datos.
 - Productos: `GET/POST/PUT /api/productos`; inventario: `GET /api/inventario?sucursal=`.
 - Ventas y traspasos: `POST /api/ventas` y `POST /api/traspasos`.
 - Reportes: `GET /api/reportes/ventas-sucursal` y `/existencias-consolidado` (administrador/gerente).

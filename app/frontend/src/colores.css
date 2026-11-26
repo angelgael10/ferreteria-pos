@@ -1,0 +1,239 @@
+:root {
+  --crema: #f7f7f4;
+  --papel: #ffffff;
+  --tinta: #1c1d21;
+  --suave: #5d6670;
+  --verde: #0b57a4;
+  --verde-claro: #2e7ed0;
+  --menta: #e8f1fb;
+  --teja: #f96302;
+  --teja-claro: #fff0e4;
+  --arena: #e2b85c;
+  --linea: #dfe1e3;
+  --linea-fuerte: #c5c9ce;
+  --sombra: 0 24px 55px rgba(28, 29, 33, 0.12), 0 3px 10px rgba(28, 29, 33, 0.06);
+  --sombra-suave: 0 12px 30px rgba(28, 29, 33, 0.08);
+}
+
+body {
+  background:
+    radial-gradient(circle at 2% -4%, rgba(249, 99, 2, 0.1), transparent 30rem),
+    radial-gradient(circle at 98% 4%, rgba(11, 87, 164, 0.12), transparent 32rem),
+    radial-gradient(circle at 50% 105%, rgba(226, 184, 92, 0.09), transparent 38rem),
+    var(--crema);
+}
+
+.encabezado {
+  background: linear-gradient(135deg, #083d77 0%, #0b57a4 56%, #2e7ed0 100%);
+}
+
+.encabezado::after {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 38px rgba(255, 255, 255, 0.035);
+}
+
+.marca-icono {
+  background: linear-gradient(145deg, #f96302, #d65008);
+  box-shadow: 0 10px 24px rgba(249, 99, 2, 0.3);
+}
+
+.folio-linea {
+  color: #ffd8a8;
+}
+
+.usuario-chip {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.barra {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+.barra button.activo {
+  background: linear-gradient(135deg, var(--verde), var(--verde-claro));
+  box-shadow: 0 8px 18px rgba(11, 87, 164, 0.24);
+}
+
+.nav-num {
+  color: var(--teja);
+  background: var(--teja-claro);
+}
+
+.barra button.activo .nav-num {
+  color: #ffe3c2;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.barra button.salir {
+  color: #b3222b;
+  background: #fbe9ea;
+}
+
+.barra-sucursal {
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0.96), rgba(232, 241, 251, 0.82));
+}
+
+.barra-sucursal::before {
+  background: var(--verde-claro);
+  box-shadow: 0 0 0 5px rgba(46, 126, 208, 0.14);
+}
+
+.sucursal-actual strong {
+  color: var(--verde);
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.97);
+}
+
+.card-header::after {
+  background: var(--teja);
+}
+
+.eyebrow {
+  color: #c14f00;
+  background: var(--teja-claro);
+}
+
+.contador {
+  color: var(--verde);
+  background: var(--menta);
+}
+
+input,
+select {
+  background: #fff;
+  border-color: var(--linea-fuerte);
+}
+
+input:focus,
+select:focus {
+  border-color: var(--teja);
+  box-shadow: 0 0 0 4px rgba(249, 99, 2, 0.14);
+}
+
+button {
+  background: linear-gradient(135deg, var(--verde), var(--verde-claro));
+  box-shadow: 0 8px 18px rgba(11, 87, 164, 0.18);
+}
+
+button.sec {
+  color: var(--verde);
+  background: var(--menta);
+}
+
+button.sec:hover:not(:disabled) {
+  color: var(--verde);
+  background: #d9e8f8;
+}
+
+button.btn-cantidad {
+  color: var(--verde);
+  background: var(--menta);
+}
+
+button.btn-cantidad:hover:not(:disabled) {
+  color: #fff;
+  background: var(--verde-claro);
+}
+
+button.peligro {
+  color: #b3222b;
+  background: #fbe9ea;
+}
+
+button.peligro:hover:not(:disabled) {
+  color: #fff;
+  background: #b3222b;
+}
+
+.login-card {
+  border-top-color: var(--teja);
+}
+
+.login-card::after {
+  background: rgba(249, 99, 2, 0.06);
+}
+
+.formulario-producto {
+  background: rgba(11, 87, 164, 0.055);
+  border-color: rgba(11, 87, 164, 0.16);
+}
+
+caption {
+  background: #f4f5f3;
+}
+
+thead th {
+  background: rgba(255, 255, 255, 0.76);
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(247, 247, 244, 0.78);
+}
+
+tbody tr:hover {
+  background: rgba(232, 241, 251, 0.82);
+}
+
+.etiqueta {
+  color: var(--verde);
+  background: var(--menta);
+}
+
+.badge-ok {
+  color: #1f7a4d;
+  background: #e4f2e9;
+}
+
+.badge-bajo {
+  color: #8a5a16;
+  background: #f8ebc9;
+}
+
+.badge-agotado {
+  color: #b3222b;
+  background: #fbe9ea;
+}
+
+.alerta-error {
+  color: #b3222b;
+  background: #fbe9ea;
+}
+
+.alerta-ok {
+  color: #1f7a4d;
+  background: #e4f2e9;
+}
+
+.vacio {
+  background: linear-gradient(135deg, #fdfdfc, #f1f2ef);
+}
+
+.producto-item {
+  border-left-color: var(--teja);
+}
+
+.producto-item:hover {
+  border-color: rgba(249, 99, 2, 0.4);
+  border-left-color: var(--teja);
+}
+
+.producto-precio {
+  color: #c14f00;
+}
+
+.total-caja {
+  background: linear-gradient(135deg, var(--verde), #2e7ed0);
+  box-shadow: 0 12px 26px rgba(11, 87, 164, 0.22);
+}
+
+.reporte-card:first-child {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(244, 245, 243, 0.92));
+}
+
+.postal-resultado {
+  background: #f4f5f3;
+}

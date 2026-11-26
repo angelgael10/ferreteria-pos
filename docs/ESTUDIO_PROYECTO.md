@@ -6,13 +6,19 @@
 ## 1. Qué se construyó y dónde está
 - **Repositorio:** `C:\Users\chant\ferreteria-pos`
 - **Base de datos (Docker):** `docker-compose.yml` (servicio `db`, imagen `postgres:18`, contenedor `ferreteria_db`, host `localhost:5433`, BD/usuario `ferreteria`, volumen `pgdata`, scripts montados en `/docker-entrypoint-initdb.d`).
-- **Scripts SQL:** `db/01_esquema.sql` (tablas núcleo, tipo compuesto, arreglos, JSONB), `db/02_herencia.sql` (INHERITS), `db/03_funciones.sql` (PL/pgSQL venta/traspaso), `db/04_triggers.sql` (bitácora), `db/05_vistas.sql`, `db/06_datos.sql` (semilla). Pruebas/notas: `db/pruebas/`.
-- **Backend API:** `app/backend/src` (`index.js`, `db/pool.js`, `middleware/auth.js` y rutas en `routes/`: auth, productos, inventario, ventas, traspasos, reportes, codigosPostales, sucursales).
-- **Frontend:** `app/frontend/src` (`App.jsx`, `api.js`, `main.jsx`, `styles.css`, `vite.config.js`).
+- **Scripts SQL:** `db/01_esquema.sql` (tablas núcleo, tipo compuesto, arreglos, JSONB), `db/02_herencia.sql` (INHERITS), `db/03_funciones.sql` (PL/pgSQL venta/traspaso), `db/04_triggers.sql` (bitácora), `db/05_vistas.sql`, `db/06_datos.sql` (semilla), `db/07_correcion_texto.sql` (UTF-8 en base ya cargada). Pruebas/notas: `db/pruebas/`.
+
+- **Backend API:** `app/backend/src` (`index.js`, `db/pool.js`, `middleware/auth.js` y rutas en `routes/`: auth, productos, inventario, ventas, traspasos, reportes, codigosPostales, sucursales). Pruebas mínimas: `app/backend/tests/auth.test.js` con `npm test`.
+
+- **Frontend:** `app/frontend/src` (`App.jsx`, `api.js`, `main.jsx`, `styles.css`, `diseno.css`, `colores.css`, `tipografia.css`, `vite.config.js`).
+
 - **Documentación:** `docs/arquitectura.md`, `backlog.md`, `bitacora-ia.md`, `retrospectivas.md`, `manual_tecnico.md`, `manual_usuario.md`, `declaracion_ia.md`, `paso1_postgres_version.txt`.
+- **Evidencias de producto reforzadas:** `docs/evidencias/producto_pw_normativa_dom.md`, `producto_pw_componentes_mvc.md`, `producto_bd_motor_conjuntos.md` y `guion_demo_vivo.md`.
+
 
 ## 2. Modelo de datos y BD orientada a objetos (U.I, U.II BD)
-- **Relacional (U.I):** tablas `sucursal`, `usuario`, `producto`, `inventario`, `venta`, `venta_detalle`, `traspaso`, `traspaso_detalle`, `bitacora` con PK/FK/UNIQUE/CHECK. Evidencias: diagrama (ver sección 10) y DDL/DML en `db/01`-`06`.
+- **Relacional (U.I):** tablas `sucursal`, `usuario`, `producto`, `inventario`, `venta`, `venta_detalle`, `traspaso`, `traspaso_detalle`, `bitacora` con PK/FK/UNIQUE/CHECK. Evidencias: diagrama (ver sección 10) y DDL/DML en `db/01`-`07`.
+
 - **Tipo compuesto:** `dimensiones_t (largo_cm, ancho_cm, alto_cm, peso_kg)` usado en `producto.dimensiones`.
 - **Arreglos:** `etiquetas TEXT[]`, `codigos_alternos TEXT[]` en `producto` (búsqueda con `unnest`/GIN).
 - **JSONB:** `especificaciones JSONB` en `producto` y `detalle JSONB` en `bitacora` (índice GIN en especificaciones).
@@ -59,7 +65,8 @@
 - **Frameworks (U.IV):** Express (routing, middlewares, JSON/CORS) y React+Vite (componentes, hooks, HMR/proxy). Redactar reportes de componentes e implementación MVC en el documento final.
 
 ## 9. API implementada (resumen)
-- `GET /api/health` estado BD; `POST /api/auth/login` devuelve token HMAC; `GET/POST/PUT /api/productos`; `GET /api/inventario?sucursal=`; `POST /api/ventas`; `POST /api/traspasos`; `GET /api/reportes/ventas-sucursal` y `/existencias-consolidado` (administrador/gerente); `GET /api/codigos-postales/:cp`; `GET /api/sucursales`.
+- `GET /api/health` estado BD; `POST /api/auth/login` devuelve token HMAC; `GET /api/auth/me` reconcilia la sesión con la BD; `GET/POST/PUT /api/productos`; `GET /api/inventario?sucursal=`; `POST /api/ventas`; `POST /api/traspasos`; `GET /api/reportes/ventas-sucursal` y `/existencias-consolidado` (administrador/gerente); `GET /api/codigos-postales/:cp`; `GET /api/sucursales`.
+
 
 ## 10. Diagrama relacional (Mermaid, base para tu diagrama formal)
 ```mermaid

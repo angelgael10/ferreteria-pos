@@ -1,22 +1,23 @@
 -- 06_datos.sql
 -- Datos de ejemplo (DML) para sucursales, usuarios, productos, inventario y casos de prueba.
+SET client_encoding = 'UTF8';
 
 -- =========================================================
 -- Sucursales (Cancún, Playa del Carmen, Chetumal)
 -- =========================================================
 INSERT INTO sucursal (nombre, ciudad, direccion, telefono) VALUES -- inserta las tres sucursales
-('Ferretería Cancún Centro', 'Cancún', 'Av. Tulum 100, Centro', '998-000-0001'), -- sucursal en Cancún
-('Ferretería Playa Centro', 'Playa del Carmen', 'Calle 12 Norte 200, Centro', '984-000-0002'), -- sucursal en Playa del Carmen
-('Ferretería Chetumal Centro', 'Chetumal', 'Av. Héroes 300, Centro', '983-000-0003'); -- sucursal en Chetumal
+(U&'Ferreter\00eda Canc\00fan Centro', U&'Canc\00fan', U&'Av. Tulum 100, Centro', '998-000-0001'), -- sucursal en Cancún
+(U&'Ferreter\00eda Playa Centro', 'Playa del Carmen', U&'Calle 12 Norte 200, Centro', '984-000-0002'), -- sucursal en Playa del Carmen
+(U&'Ferreter\00eda Chetumal Centro', 'Chetumal', U&'Av. H\00e9roes 300, Centro', '983-000-0003'); -- sucursal en Chetumal
 
 -- =========================================================
 -- Usuarios de ejemplo (clave_hash es demostrativa; en la app se usa hash real)
 -- =========================================================
 INSERT INTO usuario (nombre, correo, clave_hash, rol, id_sucursal) VALUES -- inserta usuarios por rol
 ('Admin General', 'admin@ferreteria.local', 'hash_demo_admin', 'administrador', NULL), -- administrador global
-('Gerente Cancún', 'gerente.cancun@ferreteria.local', 'hash_demo_gerente', 'gerente', 1), -- gerente de Cancún
-('Cajero Cancún 1', 'cajero1.cancun@ferreteria.local', 'hash_demo_cajero', 'cajero', 1), -- cajero 1 en Cancún
-('Cajero Cancún 2', 'cajero2.cancun@ferreteria.local', 'hash_demo_cajero', 'cajero', 1), -- cajero 2 en Cancún (para prueba concurrencia)
+(U&'Gerente Canc\00fan', 'gerente.cancun@ferreteria.local', 'hash_demo_gerente', 'gerente', 1), -- gerente de Cancún
+(U&'Cajero Canc\00fan 1', 'cajero1.cancun@ferreteria.local', 'hash_demo_cajero', 'cajero', 1), -- cajero 1 en Cancún
+(U&'Cajero Canc\00fan 2', 'cajero2.cancun@ferreteria.local', 'hash_demo_cajero', 'cajero', 1), -- cajero 2 en Cancún (para prueba concurrencia)
 ('Gerente Playa', 'gerente.playa@ferreteria.local', 'hash_demo_gerente', 'gerente', 2), -- gerente de Playa del Carmen
 ('Cajero Playa', 'cajero.playa@ferreteria.local', 'hash_demo_cajero', 'cajero', 2), -- cajero en Playa del Carmen
 ('Gerente Chetumal', 'gerente.chetumal@ferreteria.local', 'hash_demo_gerente', 'gerente', 3), -- gerente de Chetumal
@@ -27,7 +28,7 @@ INSERT INTO usuario (nombre, correo, clave_hash, rol, id_sucursal) VALUES -- ins
 -- =========================================================
 INSERT INTO producto_herramienta (sku, nombre, descripcion, precio_mxn, unidad_medida, dimensiones, etiquetas, codigos_alternos, especificaciones, material_mango, tipo_herramienta, uso)
 VALUES -- inserta una herramienta heredando de producto
-('HER-001', 'Martillo uña 16oz', 'Martillo de uña para carpintería', 189.00, 'pieza', -- datos base
+('HER-001', U&'Martillo u\00f1a 16oz', U&'Martillo de u\00f1a para carpinter\00eda', 189.00, 'pieza', -- datos base
  ROW(33.0, 12.0, 3.0, 0.45)::dimensiones_t, -- valor del tipo compuesto dimensiones_t
  ARRAY['martillo','carpinteria','manual'], -- arreglo de etiquetas
  ARRAY['750100000001'], -- arreglo de códigos alternos
@@ -36,19 +37,19 @@ VALUES -- inserta una herramienta heredando de producto
 
 INSERT INTO producto_herramienta (sku, nombre, descripcion, precio_mxn, unidad_medida, dimensiones, etiquetas, codigos_alternos, especificaciones, material_mango, tipo_herramienta, uso)
 VALUES -- inserta otra herramienta
-('HER-002', 'Desarmador plano 1/4', 'Desarmador plano de precisión', 45.00, 'pieza', -- datos base
+('HER-002', 'Desarmador plano 1/4', U&'Desarmador plano de precisi\00f3n', 45.00, 'pieza', -- datos base
  ROW(20.0, 2.5, 2.5, 0.08)::dimensiones_t, -- dimensiones
  ARRAY['desarmador','plano','manual'], -- etiquetas
  ARRAY['750100000002'], -- códigos alternos
  '{"punta": "plana", "medida": "1/4"}'::jsonb, -- especificaciones JSONB
- 'plástico', 'manual', 'atornillar'); -- atributos de herramienta
+ U&'pl\00e1stico', 'manual', 'atornillar'); -- atributos de herramienta
 
 -- =========================================================
 -- Productos: materiales (subclase con INHERITS)
 -- =========================================================
 INSERT INTO producto_material (sku, nombre, descripcion, precio_mxn, unidad_medida, dimensiones, etiquetas, codigos_alternos, especificaciones, tipo_material, presentacion, rendimiento)
 VALUES -- inserta un material heredando de producto
-('MAT-001', 'Cemento gris 50kg', 'Cemento Portland gris para construcción', 235.00, 'saco', -- datos base
+('MAT-001', 'Cemento gris 50kg', U&'Cemento Portland gris para construcci\00f3n', 235.00, 'saco', -- datos base
  ROW(60.0, 40.0, 15.0, 50.0)::dimensiones_t, -- dimensiones
  ARRAY['cemento','construccion','obra'], -- etiquetas
  ARRAY['750100000101'], -- códigos alternos
@@ -57,7 +58,7 @@ VALUES -- inserta un material heredando de producto
 
 INSERT INTO producto_material (sku, nombre, descripcion, precio_mxn, unidad_medida, dimensiones, etiquetas, codigos_alternos, especificaciones, tipo_material, presentacion, rendimiento)
 VALUES -- inserta otro material
-('MAT-002', 'Pintura vinílica blanca 19L', 'Pintura vinílica interior/exterior', 720.00, 'cubeta', -- datos base
+('MAT-002', U&'Pintura vin\00edlica blanca 19L', U&'Pintura vin\00edlica interior/exterior', 720.00, 'cubeta', -- datos base
  ROW(30.0, 30.0, 40.0, 22.0)::dimensiones_t, -- dimensiones
  ARRAY['pintura','vinilica','blanca'], -- etiquetas
  ARRAY['750100000102'], -- códigos alternos
@@ -69,7 +70,7 @@ VALUES -- inserta otro material
 -- =========================================================
 INSERT INTO producto_electrico (sku, nombre, descripcion, precio_mxn, unidad_medida, dimensiones, etiquetas, codigos_alternos, especificaciones, voltaje, consumo_watts, certificacion)
 VALUES -- inserta un producto eléctrico heredando de producto
-('ELE-001', 'Foco LED 12W', 'Foco LED luz blanca ahorro de energía', 65.00, 'pieza', -- datos base
+('ELE-001', 'Foco LED 12W', U&'Foco LED luz blanca ahorro de energ\00eda', 65.00, 'pieza', -- datos base
  ROW(6.0, 6.0, 11.0, 0.05)::dimensiones_t, -- dimensiones
  ARRAY['foco','led','iluminacion'], -- etiquetas
  ARRAY['750100000201'], -- códigos alternos
@@ -78,7 +79,7 @@ VALUES -- inserta un producto eléctrico heredando de producto
 
 INSERT INTO producto_electrico (sku, nombre, descripcion, precio_mxn, unidad_medida, dimensiones, etiquetas, codigos_alternos, especificaciones, voltaje, consumo_watts, certificacion)
 VALUES -- inserta otro producto eléctrico
-('ELE-002', 'Extensión eléctrica 5m', 'Extensión de uso rudo 3 contactos', 150.00, 'pieza', -- datos base
+('ELE-002', U&'Extensi\00f3n el\00e9ctrica 5m', U&'Extensi\00f3n de uso rudo 3 contactos', 150.00, 'pieza', -- datos base
  ROW(25.0, 20.0, 6.0, 0.60)::dimensiones_t, -- dimensiones
  ARRAY['extension','electrico','cable'], -- etiquetas
  ARRAY['750100000202'], -- códigos alternos

@@ -2,7 +2,8 @@
 const express = require('express'); // importa Express para crear el router
 const router = express.Router(); // crea una instancia de Router
 const pool = require('../db/pool'); // importa el pool de conexión a la base de datos
-const { firmar } = require('../middleware/auth'); // genera el token de sesión firmado
+const { firmar, verificar } = require('../middleware/auth'); // genera y verifica el token de sesión firmado
+
 
 // POST /api/auth/login - inicio de sesión básico por correo y contraseña (demo)
 // Nota: en un sistema real la contraseña se compara con hash (bcrypt) y se usa JWT/sesión.
@@ -26,5 +27,19 @@ router.post('/login', async (req, res) => { // define la ruta POST /login
     res.status(500).json({ error: 'No se pudo iniciar sesión' }); // responde error interno
   } // fin del try/catch
 }); // fin de la ruta POST /login
+
+router.get('/me', verificar, async (req, res) => { // devuelve el usuario vigente desde la base de datos
+  try {
+    const q = `SELECT id_usuario, nombre, correo, rol, id_sucursal
+               FROM usuario WHERE id_usuario = $1 AND activo = TRUE`;
+    const r = await pool.query(q, [req.usuario.id_usuario]);
+    if (r.rows.length === 0) {
+      return res.status(401).json({ error: 'Sesión no válida' });
+    }
+    res.json({ ok: true, usuario: r.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'No se pudo obtener la sesión' });
+  }
+});
 
 module.exports = router; // exporta el router para montarlo en index.js

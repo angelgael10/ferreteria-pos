@@ -50,7 +50,7 @@ npm install
 npm run dev
 ```
 
-Backend: `http://localhost:3001`. Frontend: `http://localhost:5173` (proxy `/api` al backend). `npm run build` verificado en el frontend.
+Backend: `http://localhost:3001`. Frontend: `http://localhost:5173` (proxy `/api` al backend). `npm run build` verificado en el frontend; `npm test` ejecuta las pruebas mínimas del backend.
 
 ## Usuarios demo
 - `admin@ferreteria.local` / `hash_demo_admin` (administrador)

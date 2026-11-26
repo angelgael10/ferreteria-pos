@@ -1,18 +1,18 @@
 :root {
-  --crema: #f7f3eb;
+  --hueso: #f6f3ee;
   --papel: #fffdf9;
-  --tinta: #1d302b;
-  --suave: #6d7b74;
-  --verde: #1f4b40;
-  --verde-claro: #2f6d5b;
-  --menta: #dfeee7;
-  --teja: #c06543;
-  --teja-claro: #f6e7df;
+  --tinta: #1f2124;
+  --suave: #656970;
+  --marca: #f96302;
+  --marca-clara: #ff8a2b;
+  --humo: #f1eee8;
+  --naranja: #f96302;
+  --naranja-claro: #fff0e2;
   --arena: #d9b76f;
-  --linea: #e8e0d4;
-  --linea-fuerte: #d3c9b9;
-  --sombra: 0 24px 55px rgba(29, 48, 43, 0.11), 0 3px 10px rgba(29, 48, 43, 0.05);
-  --sombra-suave: 0 12px 30px rgba(29, 48, 43, 0.07);
+  --linea: #dedbd5;
+  --linea-fuerte: #c6c2ba;
+  --sombra: 0 24px 55px rgba(31, 33, 36, 0.12), 0 3px 10px rgba(31, 33, 36, 0.06);
+  --sombra-suave: 0 12px 30px rgba(31, 33, 36, 0.08);
   --radio-xl: 34px;
   --radio-lg: 24px;
   --radio-md: 16px;
@@ -31,7 +31,7 @@
   z-index: 100;
   padding: 10px 16px;
   color: #fff;
-  background: var(--verde);
+  background: var(--marca);
   border-radius: var(--pastilla);
   font-weight: 700;
 }
@@ -42,7 +42,7 @@
 
 html {
   min-height: 100%;
-  background: var(--crema);
+  background: var(--hueso);
 }
 
 body {
@@ -53,7 +53,7 @@ body {
     radial-gradient(circle at 4% -4%, rgba(192, 101, 67, 0.11), transparent 30rem),
     radial-gradient(circle at 96% 8%, rgba(47, 109, 91, 0.12), transparent 32rem),
     radial-gradient(circle at 50% 100%, rgba(217, 183, 111, 0.08), transparent 38rem),
-    var(--crema);
+    var(--hueso);
   font-family: "Aptos", "Segoe UI", system-ui, -apple-system, sans-serif;
   font-size: 15px;
   line-height: 1.55;
@@ -62,7 +62,7 @@ body {
 
 ::selection {
   color: var(--papel);
-  background: var(--teja);
+  background: var(--naranja);
 }
 
 .contenedor {
@@ -81,7 +81,7 @@ body {
   padding: 30px 36px;
   overflow: hidden;
   color: #fbf7ef;
-  background: linear-gradient(135deg, var(--verde) 0%, #285c4d 58%, #367565 100%);
+  background: linear-gradient(135deg, #1f2124 0%, #2d3035 58%, #3b3f45 100%);
   border: 0;
   border-radius: var(--radio-xl);
   box-shadow: var(--sombra);
@@ -94,7 +94,7 @@ body {
   left: 0;
   width: 9px;
   content: "";
-  background: var(--teja);
+  background: var(--naranja);
   border-radius: 0 var(--pastilla) var(--pastilla) 0;
 }
 
@@ -129,7 +129,7 @@ body {
   height: 66px;
   place-items: center;
   color: #fff7e9;
-  background: linear-gradient(145deg, var(--teja), #a94e32);
+  background: linear-gradient(145deg, #f96302, #c94d00);
   border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: 22px;
   box-shadow: 0 10px 24px rgba(129, 57, 34, 0.3);
@@ -228,12 +228,12 @@ body {
 
 .barra button:hover {
   color: var(--tinta);
-  background: var(--menta);
+  background: var(--humo);
 }
 
 .barra button.activo {
   color: #fffaf0;
-  background: linear-gradient(135deg, var(--verde), var(--verde-claro));
+  background: linear-gradient(135deg, var(--marca), var(--marca-clara));
   box-shadow: 0 8px 18px rgba(31, 75, 64, 0.22);
 }
 
@@ -242,8 +242,8 @@ body {
   min-width: 22px;
   height: 22px;
   place-items: center;
-  color: var(--teja);
-  background: var(--teja-claro);
+  color: var(--naranja);
+  background: var(--naranja-claro);
   border-radius: var(--pastilla);
   font-family: ui-monospace, Consolas, monospace;
   font-size: 0.64rem;
@@ -257,8 +257,8 @@ body {
 
 .barra button.salir {
   margin-left: auto;
-  color: var(--teja);
-  background: var(--teja-claro);
+  color: var(--naranja);
+  background: var(--naranja-claro);
 }
 
 .barra-sucursal {
@@ -280,7 +280,7 @@ body {
   width: 9px;
   height: 9px;
   content: "";
-  background: var(--verde-claro);
+  background: var(--marca-clara);
   border-radius: 50%;
   box-shadow: 0 0 0 5px rgba(47, 109, 91, 0.12);
 }
@@ -305,7 +305,7 @@ body {
 }
 
 .sucursal-actual strong {
-  color: var(--teja);
+  color: var(--naranja);
 }
 
 .card {
@@ -340,7 +340,7 @@ body {
   width: 62px;
   height: 3px;
   content: "";
-  background: var(--teja);
+  background: var(--naranja);
   border-radius: var(--pastilla);
 }
 
@@ -355,8 +355,8 @@ body {
 .eyebrow {
   display: inline-block;
   padding: 4px 10px;
-  color: var(--teja);
-  background: var(--teja-claro);
+  color: var(--naranja);
+  background: var(--naranja-claro);
   border-radius: var(--pastilla);
   font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
   font-size: 0.64rem;
@@ -376,8 +376,8 @@ body {
   align-items: center;
   flex: 0 0 auto;
   padding: 6px 12px;
-  color: var(--verde);
-  background: var(--menta);
+  color: var(--marca);
+  background: var(--humo);
   border-radius: var(--pastilla);
   font-size: 0.75rem;
   font-weight: 800;
@@ -414,7 +414,7 @@ select:hover {
 input:focus,
 select:focus {
   outline: none;
-  border-color: var(--teja);
+  border-color: var(--naranja);
   box-shadow: 0 0 0 4px rgba(192, 101, 67, 0.13);
 }
 
@@ -426,7 +426,7 @@ button {
   min-height: 44px;
   padding: 9px 20px;
   color: #fffaf0;
-  background: linear-gradient(135deg, var(--verde), var(--verde-claro));
+  background: linear-gradient(135deg, var(--marca), var(--marca-clara));
   border: 0;
   border-radius: var(--pastilla);
   box-shadow: 0 8px 18px rgba(31, 75, 64, 0.16);
@@ -453,13 +453,13 @@ button:disabled {
 }
 
 button.sec {
-  color: var(--verde);
-  background: var(--menta);
+  color: var(--marca);
+  background: var(--humo);
   box-shadow: none;
 }
 
 button.sec:hover:not(:disabled) {
-  color: var(--verde);
+  color: var(--marca);
   background: #d3e7dd;
   box-shadow: none;
 }
@@ -478,8 +478,8 @@ button.btn-cantidad {
   height: 32px;
   place-items: center;
   padding: 0;
-  color: var(--verde);
-  background: var(--menta);
+  color: var(--marca);
+  background: var(--humo);
   border: 0;
   border-radius: 50%;
   box-shadow: none;
@@ -489,19 +489,19 @@ button.btn-cantidad {
 
 button.btn-cantidad:hover:not(:disabled) {
   color: #fff;
-  background: var(--verde-claro);
+  background: var(--marca-clara);
   box-shadow: none;
 }
 
 button.peligro {
-  color: var(--teja);
-  background: var(--teja-claro);
+  color: var(--naranja);
+  background: var(--naranja-claro);
   box-shadow: none;
 }
 
 button.peligro:hover:not(:disabled) {
   color: #fff;
-  background: var(--teja);
+  background: var(--naranja);
   box-shadow: none;
 }
 
@@ -522,7 +522,7 @@ button.peligro:hover:not(:disabled) {
   padding: 38px;
   overflow: hidden;
   border: 1px solid var(--linea);
-  border-top: 6px solid var(--teja);
+  border-top: 6px solid var(--naranja);
   border-radius: 32px;
 }
 
@@ -658,8 +658,8 @@ tbody tr:hover {
   display: inline-block;
   margin: 2px 6px 2px 0;
   padding: 4px 10px;
-  color: var(--verde);
-  background: var(--menta);
+  color: var(--marca);
+  background: var(--humo);
   border: 0;
   border-radius: var(--pastilla);
   font-family: inherit;
@@ -762,7 +762,7 @@ tbody tr:hover {
   padding: 13px 16px;
   background: #fff;
   border: 1px solid var(--linea);
-  border-left: 4px solid var(--teja);
+  border-left: 4px solid var(--naranja);
   border-radius: 18px;
   box-shadow: 0 5px 14px rgba(29, 48, 43, 0.04);
   transition: border-color 0.18s ease, transform 0.18s ease;
@@ -770,7 +770,7 @@ tbody tr:hover {
 
 .producto-item:hover {
   border-color: rgba(192, 101, 67, 0.45);
-  border-left-color: var(--teja);
+  border-left-color: var(--naranja);
   box-shadow: 0 8px 20px rgba(29, 48, 43, 0.07);
   transform: translateY(-1px);
 }
@@ -796,7 +796,7 @@ tbody tr:hover {
 }
 
 .producto-precio {
-  color: var(--teja);
+  color: var(--naranja);
   font-family: inherit;
   font-size: 0.92rem;
   font-weight: 800;
@@ -828,10 +828,10 @@ tbody tr:hover {
   margin-top: 20px;
   padding: 18px 22px;
   color: #fffaf0;
-  background: linear-gradient(135deg, var(--verde), #33705e);
+  background: linear-gradient(135deg, #f96302, #c94d00);
   border: 0;
   border-radius: 22px;
-  box-shadow: 0 12px 26px rgba(31, 75, 64, 0.2);
+  box-shadow: 0 12px 26px rgba(249, 99, 2, 0.22);
 }
 
 .total-caja span {

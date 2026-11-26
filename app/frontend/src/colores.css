@@ -1,30 +1,33 @@
 :root {
-  --crema: #f7f7f4;
+  --hueso: #f6f3ee;
   --papel: #ffffff;
-  --tinta: #1c1d21;
-  --suave: #5d6670;
-  --verde: #0b57a4;
-  --verde-claro: #2e7ed0;
-  --menta: #e8f1fb;
-  --teja: #f96302;
-  --teja-claro: #fff0e4;
-  --arena: #e2b85c;
-  --linea: #dfe1e3;
-  --linea-fuerte: #c5c9ce;
-  --sombra: 0 24px 55px rgba(28, 29, 33, 0.12), 0 3px 10px rgba(28, 29, 33, 0.06);
-  --sombra-suave: 0 12px 30px rgba(28, 29, 33, 0.08);
+  --tinta: #1f2124;
+  --suave: #656970;
+  --marca: #f96302;
+  --marca-clara: #ff8a2b;
+  --marca-oscura: #c94d00;
+  --carbon: #1f2124;
+  --carbon-claro: #3b3f45;
+  --humo: #f1eee8;
+  --naranja: #f96302;
+  --naranja-claro: #fff0e2;
+  --arena: #d9b76f;
+  --linea: #dedbd5;
+  --linea-fuerte: #c6c2ba;
+  --sombra: 0 24px 55px rgba(31, 33, 36, 0.12), 0 3px 10px rgba(31, 33, 36, 0.06);
+  --sombra-suave: 0 12px 30px rgba(31, 33, 36, 0.08);
 }
 
 body {
   background:
     radial-gradient(circle at 2% -4%, rgba(249, 99, 2, 0.1), transparent 30rem),
-    radial-gradient(circle at 98% 4%, rgba(11, 87, 164, 0.12), transparent 32rem),
-    radial-gradient(circle at 50% 105%, rgba(226, 184, 92, 0.09), transparent 38rem),
-    var(--crema);
+    radial-gradient(circle at 98% 4%, rgba(31, 33, 36, 0.07), transparent 32rem),
+    radial-gradient(circle at 50% 105%, rgba(217, 183, 111, 0.08), transparent 38rem),
+    var(--hueso);
 }
 
 .encabezado {
-  background: linear-gradient(135deg, #083d77 0%, #0b57a4 56%, #2e7ed0 100%);
+  background: linear-gradient(135deg, #1f2124 0%, #2d3035 58%, #3b3f45 100%);
 }
 
 .encabezado::after {
@@ -33,7 +36,7 @@ body {
 }
 
 .marca-icono {
-  background: linear-gradient(145deg, #f96302, #d65008);
+  background: linear-gradient(145deg, #f96302, #c94d00);
   box-shadow: 0 10px 24px rgba(249, 99, 2, 0.3);
 }
 
@@ -52,13 +55,13 @@ body {
 }
 
 .barra button.activo {
-  background: linear-gradient(135deg, var(--verde), var(--verde-claro));
-  box-shadow: 0 8px 18px rgba(11, 87, 164, 0.24);
+  background: linear-gradient(135deg, var(--marca), var(--marca-oscura));
+  box-shadow: 0 8px 18px rgba(249, 99, 2, 0.24);
 }
 
 .nav-num {
-  color: var(--teja);
-  background: var(--teja-claro);
+  color: var(--marca-oscura);
+  background: var(--naranja-claro);
 }
 
 .barra button.activo .nav-num {
@@ -72,16 +75,16 @@ body {
 }
 
 .barra-sucursal {
-  background: linear-gradient(100deg, rgba(255, 255, 255, 0.96), rgba(232, 241, 251, 0.82));
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0.96), rgba(241, 238, 232, 0.9));
 }
 
 .barra-sucursal::before {
-  background: var(--verde-claro);
-  box-shadow: 0 0 0 5px rgba(46, 126, 208, 0.14);
+  background: var(--marca);
+  box-shadow: 0 0 0 5px rgba(249, 99, 2, 0.14);
 }
 
 .sucursal-actual strong {
-  color: var(--verde);
+  color: var(--carbon);
 }
 
 .card {
@@ -89,17 +92,17 @@ body {
 }
 
 .card-header::after {
-  background: var(--teja);
+  background: var(--marca);
 }
 
 .eyebrow {
-  color: #c14f00;
-  background: var(--teja-claro);
+  color: #a84400;
+  background: var(--naranja-claro);
 }
 
 .contador {
-  color: var(--verde);
-  background: var(--menta);
+  color: var(--marca-oscura);
+  background: var(--naranja-claro);
 }
 
 input,
@@ -110,33 +113,33 @@ select {
 
 input:focus,
 select:focus {
-  border-color: var(--teja);
+  border-color: var(--marca);
   box-shadow: 0 0 0 4px rgba(249, 99, 2, 0.14);
 }
 
 button {
-  background: linear-gradient(135deg, var(--verde), var(--verde-claro));
-  box-shadow: 0 8px 18px rgba(11, 87, 164, 0.18);
+  background: linear-gradient(135deg, var(--marca), var(--marca-oscura));
+  box-shadow: 0 8px 18px rgba(249, 99, 2, 0.18);
 }
 
 button.sec {
-  color: var(--verde);
-  background: var(--menta);
+  color: var(--carbon);
+  background: var(--humo);
 }
 
 button.sec:hover:not(:disabled) {
-  color: var(--verde);
-  background: #d9e8f8;
+  color: var(--carbon);
+  background: #e3dfd7;
 }
 
 button.btn-cantidad {
-  color: var(--verde);
-  background: var(--menta);
+  color: var(--carbon);
+  background: var(--humo);
 }
 
 button.btn-cantidad:hover:not(:disabled) {
   color: #fff;
-  background: var(--verde-claro);
+  background: var(--marca-oscura);
 }
 
 button.peligro {
@@ -150,7 +153,7 @@ button.peligro:hover:not(:disabled) {
 }
 
 .login-card {
-  border-top-color: var(--teja);
+  border-top-color: var(--marca);
 }
 
 .login-card::after {
@@ -158,12 +161,12 @@ button.peligro:hover:not(:disabled) {
 }
 
 .formulario-producto {
-  background: rgba(11, 87, 164, 0.055);
-  border-color: rgba(11, 87, 164, 0.16);
+  background: rgba(249, 99, 2, 0.05);
+  border-color: rgba(249, 99, 2, 0.16);
 }
 
 caption {
-  background: #f4f5f3;
+  background: #f4f2ed;
 }
 
 thead th {
@@ -171,16 +174,16 @@ thead th {
 }
 
 tbody tr:nth-child(even) {
-  background: rgba(247, 247, 244, 0.78);
+  background: rgba(246, 243, 238, 0.78);
 }
 
 tbody tr:hover {
-  background: rgba(232, 241, 251, 0.82);
+  background: rgba(241, 238, 232, 0.86);
 }
 
 .etiqueta {
-  color: var(--verde);
-  background: var(--menta);
+  color: var(--carbon);
+  background: var(--humo);
 }
 
 .badge-ok {
@@ -209,31 +212,31 @@ tbody tr:hover {
 }
 
 .vacio {
-  background: linear-gradient(135deg, #fdfdfc, #f1f2ef);
+  background: linear-gradient(135deg, #fdfdfc, #f1eee8);
 }
 
 .producto-item {
-  border-left-color: var(--teja);
+  border-left-color: var(--marca);
 }
 
 .producto-item:hover {
   border-color: rgba(249, 99, 2, 0.4);
-  border-left-color: var(--teja);
+  border-left-color: var(--marca);
 }
 
 .producto-precio {
-  color: #c14f00;
+  color: #a84400;
 }
 
 .total-caja {
-  background: linear-gradient(135deg, var(--verde), #2e7ed0);
-  box-shadow: 0 12px 26px rgba(11, 87, 164, 0.22);
+  background: linear-gradient(135deg, var(--marca), #c94d00);
+  box-shadow: 0 12px 26px rgba(249, 99, 2, 0.22);
 }
 
 .reporte-card:first-child {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(244, 245, 243, 0.92));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(244, 242, 237, 0.92));
 }
 
 .postal-resultado {
-  background: #f4f5f3;
+  background: #f4f2ed;
 }

@@ -7,8 +7,9 @@ Archivo principal:
 El PDF incluye portada, introducción, objetivos, alcance y criterios de
 aceptación, backlog y sprints con burndown y retrospectivas, desarrollo por
 materia/unidad con evidencias, pruebas y resultados, conclusiones,
-referencias IEEE [1] y [2], y anexos (manual técnico, manual de usuario,
-declaración de IA y bitácora de IA con 10 interacciones).
+ajustes finales, tabla de correspondencia con la guía, referencias IEEE [1]
+y [2], y anexos (manual técnico, manual de usuario, declaración de IA y
+bitácora de IA con 10 interacciones).
 
 Capturas reales (docs/evidencias/capturas):
 - 01-login.png
@@ -32,6 +33,10 @@ Evidencias de ejecución (docs/evidencias):
 - live_concurrencia_lock.txt
 - live_concurrencia_final.txt
 - resumen_evidencias.md
+- producto_pw_normativa_dom.md
+- producto_pw_componentes_mvc.md
+- producto_bd_motor_conjuntos.md
+- guion_demo_vivo.md
 - explain_resultados.txt
 - almacenamiento_resultados.txt
 - traspaso_resultados.txt

@@ -820,8 +820,7 @@ th.numero {
   flex-wrap: wrap;
 }
 
-.formulario-producto,
-.formulario-postal {
+.formulario-producto {
   display: grid;
   gap: 12px;
   margin: 16px 0;
@@ -830,26 +829,11 @@ th.numero {
   border-radius: var(--radio);
 }
 
-.formulario-postal {
-  grid-template-columns: 1fr auto auto;
-  align-items: end;
-}
-
-.formulario-postal label {
-  grid-column: 1 / -1;
-}
-
-.postal-resultado {
+.tipo-cambio {
   padding: 14px 16px;
   background: var(--humo-100);
   border-left: 4px solid var(--marca-700);
   border-radius: var(--radio-sm);
-}
-
-.lista-asentamientos {
-  margin: 8px 0 0;
-  padding-left: 20px;
-  columns: 2;
 }
 
 caption {
@@ -865,16 +849,6 @@ caption {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-}
-
-@media (max-width: 720px) {
-  .formulario-postal {
-    grid-template-columns: 1fr;
-  }
-
-  .lista-asentamientos {
-    columns: 1;
-  }
 }
 
 :root {
@@ -1457,16 +1431,7 @@ th.numero {
   border-top-color: var(--amber);
 }
 
-.formulario-postal {
-  grid-template-columns: minmax(180px, 260px) auto auto;
-  align-items: end;
-}
-
-.formulario-postal label {
-  grid-column: auto;
-}
-
-.postal-resultado {
+.tipo-cambio {
   padding: 14px 16px;
   background: #fffefa;
   border: 1px dashed var(--steel);
@@ -1474,14 +1439,9 @@ th.numero {
   box-shadow: 4px 4px 0 rgba(36, 84, 105, 0.12);
 }
 
-.postal-resultado p:first-child {
+.tipo-cambio p:first-child {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.1rem;
-}
-
-.lista-asentamientos {
-  color: var(--steel);
-  font-size: 0.82rem;
 }
 
 @media (max-width: 900px) {
@@ -1552,14 +1512,6 @@ th.numero {
 
   .card h3 {
     font-size: 1.2rem;
-  }
-
-  .formulario-postal {
-    grid-template-columns: 1fr;
-  }
-
-  .formulario-postal label {
-    grid-column: auto;
   }
 
   .total-caja strong {

@@ -41,11 +41,11 @@ Como negocio, quiero evitar la sobreventa del último artículo.
 - **Entonces** el stock nunca queda negativo.
 
 ## HU-08 Consulta a API externa (Sprint 3)
-**Decisión final:** la historia se formuló originalmente con Banxico SIE, pero se sustituyó por la API de códigos postales Postali para tener una consulta real sin token. Issue #8 cerrado con ese criterio.
+**Decisión final:** la historia se conservó con Banxico SIE. El backend consulta la serie SF43718 con token `Bmx-Token` y muestra el dato oportuno en Reportes. Issue #8 cerrado con ese criterio.
 
-Como cajero, quiero consultar datos externos para apoyar la venta.
-- **Dado** un código postal de 5 dígitos, **cuando** consulto, **entonces** el sistema muestra estado, municipio y asentamientos.
-- **Dado** un código inexistente o mal formado, **cuando** consulto, **entonces** el sistema responde 404 o 400 con un aviso y no se cae.
+Como gerente, quiero consultar datos externos para apoyar la operación.
+- **Dado** un token válido configurado, **cuando** abro Reportes, **entonces** veo el tipo de cambio USD/MXN con fecha y serie.
+- **Dado** un token inválido, **cuando** consulto, **entonces** el sistema responde 400 con un aviso y no se cae.
 - **Dado** que la API falla, **cuando** consulto, **entonces** se muestra un mensaje controlado (502/503).
 
 ## HU-09 Respaldo y recuperación PITR (Sprint 3)

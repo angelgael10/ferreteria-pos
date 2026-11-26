@@ -16,14 +16,14 @@
 
 ## Sprint 3 – Integración
 - **Objetivo:** particionamiento, replicación, FDW, 2PC, PITR, API externa, EXPLAIN.
-- **Qué se logró:** PITR real con `pg_basebackup` + WAL (solo filas 1 y 2), particionamiento con poda, réplica streaming, FDW A→B y 2PC con dos transacciones preparadas; Banxico responde aviso controlado sin token.
+- **Qué se logró:** PITR real con `pg_basebackup` + WAL (solo filas 1 y 2), particionamiento con poda, réplica streaming, FDW A→B y 2PC con dos transacciones preparadas; Banxico responde el dato oportuno de SF43718 con token.
 - **Qué funcionó bien:** las demostraciones en contenedores separados fueron reproducibles; la réplica mostró las filas del primario y `pg_prepared_xacts` evidenció el 2PC.
 - **Qué se puede mejorar:** el índice btree no se usa con `ILIKE '%...%'` y herencia; `postgres_fdw` no admite `PREPARE TRANSACTION`; `recovery.signal` debe existir antes del primer arranque.
-- **Acciones para el siguiente sprint:** capturas, sustituir Banxico por una API sin token, repositorio en GitHub y ensayo de la defensa.
+- **Acciones para el siguiente sprint:** capturas, integrar Banxico con token, repositorio en GitHub y ensayo de la defensa.
 
 ## Sprint 4 – Cierre y defensa
 - **Objetivo:** reportes, pruebas, documentación final, capturas, publicación y cambio en vivo.
-- **Qué se logró:** reportes con control de roles, sesión HMAC, API de códigos postales, 13 capturas reales, repetición de la concurrencia, 18/18 issues cerrados, README y documentación final.
+- **Qué se logró:** reportes con control de roles, sesión HMAC, API Banxico, 13 capturas reales, repetición de la concurrencia, 18/18 issues cerrados, README y documentación final.
 - **Qué funcionó bien:** cada evidencia se generó ejecutando el sistema y documentando también los errores y su corrección; `npm run build` del frontend pasó sin errores.
 - **Qué se puede mejorar:** la búsqueda `ILIKE '%...%'` podría optimizarse con `pg_trgm` en las tablas hijas; la bitácora duplica eventos por venta; conviene ensayar el cambio en vivo (ajustar stock o crear una venta).
 - **Lecciones aprendidas:** no documentar resultados sin ejecutarlos; los fallos (BOM, comillas de PowerShell, `recovery.signal`, límite de FDW y `sku` NULL al insertar en tablas hijas) son parte válida del aprendizaje y de la bitácora.

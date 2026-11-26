@@ -53,10 +53,10 @@ Resultado esperado: stock menor en una unidad y evento nuevo en bitácora.
 
 ## 5. Paso 4: API externa y casos de error
 
-1. En Reportes consultar `77500`: debe devolver Quintana Roo, Benito Juárez y asentamientos.
-2. Consultar `99999`: debe devolver 404 controlado.
-3. Consultar `abc`: debe devolver 400 controlado.
-4. Si falla la red, explicar que el backend devuelve 503 con mensaje propio por el timeout de 8 segundos.
+1. Entrar a Reportes con gerente o administrador.
+2. Mostrar el tipo de cambio de Banxico: serie SF43718, fecha y valor USD/MXN.
+3. Explicar que el token viaja en el header `Bmx-Token` desde el backend, nunca desde el navegador.
+4. Si el token es inválido, el backend responde 400 controlado; si falla la red, responde 503 por el timeout de 8 segundos.
 
 Evidencia: capturas 09 y 10; `docs/evidencias/api_externa_resultados.txt`.
 
@@ -115,4 +115,4 @@ La opción 1 es la más segura: toca `Productos`, `form` y `POST /productos`; se
 - **Bitácora duplicada:** trigger y función pueden escribir el mismo evento; está anotado como mejora.
 - **ILIKE con comodín inicial:** no aprovecha btree; la mejora sería `pg_trgm` o búsqueda por prefijo.
 - **FDW y 2PC:** `postgres_fdw` no permite `PREPARE TRANSACTION` directo; se documentó la limitación y se comprobó Prepare/Commit en los nodos.
-- **API externa:** Postali se eligió porque no pide token; el error de red está controlado con 503.
+- **API externa:** Banxico se consulta con token en el header `Bmx-Token`; los errores 400/502/503 están controlados.

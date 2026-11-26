@@ -20,8 +20,8 @@ Capturas reales (docs/evidencias/capturas):
 - 06-pos-busqueda.png
 - 07-pos-carrito.png
 - 08-reportes.png
-- 09-api-codigo-postal.png
-- 10-api-cp-error.png
+- 09-api-banxico.png
+- 10-api-banxico-movil.png
 - 11-login-movil.png
 - 12-github-repo.png
 - 13-concurrencia-sesiones.png

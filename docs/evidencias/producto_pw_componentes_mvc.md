@@ -22,7 +22,7 @@ Este documento reúne la evidencia solicitada por la unidad IV de Programación 
 | `Productos` | Catálogo, búsqueda en vivo y alta de productos. | `app/frontend/src/App.jsx` línea 252 |
 | `Inventario` | Existencias filtradas por sucursal. | `app/frontend/src/App.jsx` línea 409 |
 | `POS` | Búsqueda, carrito, cantidades, total y cobro. | `app/frontend/src/App.jsx` línea 480 |
-| `Reportes` | Ventas consolidadas, stock total y consulta a Postali. | `app/frontend/src/App.jsx` línea 651 |
+| `Reportes` | Ventas consolidadas, stock total y tipo de cambio de Banxico. | `app/frontend/src/App.jsx` línea 650 |
 
 Los hooks utilizados son `useState` y `useEffect`. No se añadió una librería de estado externa porque el estado de esta interfaz es local a cada vista y se sincroniza con la API mediante `api(path, options)`.
 

@@ -23,7 +23,7 @@ Sistema web MVC para inventario y punto de venta multisucursal (Cancún, Playa d
 - Catálogo de productos e inventario por sucursal.
 - Punto de venta (carrito, ventas) y traspasos entre sucursales.
 - Reportes consolidados con control de rol.
-- Consumo de servicio externo: códigos postales de México (Postali), sin token.
+- Consumo de servicio externo: tipo de cambio USD/MXN de Banxico SIE (serie SF43718), con token `Bmx-Token`.
 
 ## Base de datos (resumen)
 

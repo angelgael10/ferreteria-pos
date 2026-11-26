@@ -12,7 +12,7 @@ const inventarioRoutes = require('./routes/inventario'); // rutas de inventario 
 const ventasRoutes = require('./routes/ventas'); // rutas de punto de venta/ventas
 const traspasosRoutes = require('./routes/traspasos'); // rutas de traspasos entre sucursales
 const reportesRoutes = require('./routes/reportes'); // rutas de reportes
-const codigosPostalesRoutes = require('./routes/codigosPostales'); // rutas para consultar códigos postales (API externa)
+const banxicoRoutes = require('./routes/banxico'); // rutas para consultar el tipo de cambio de Banxico (API externa)
 const sucursalesRoutes = require('./routes/sucursales'); // rutas para listar sucursales
 
 const app = express(); // crea la aplicación Express
@@ -39,7 +39,7 @@ app.use('/api/inventario', inventarioRoutes); // monta rutas de inventario
 app.use('/api/ventas', ventasRoutes); // monta rutas de ventas
 app.use('/api/traspasos', traspasosRoutes); // monta rutas de traspasos
 app.use('/api/reportes', reportesRoutes); // monta rutas de reportes
-app.use('/api/codigos-postales', codigosPostalesRoutes); // monta rutas de códigos postales
+app.use('/api/banxico', banxicoRoutes); // monta rutas de Banxico
 app.use('/api/sucursales', sucursalesRoutes); // monta rutas de sucursales
 
 app.use((err, req, res, next) => {

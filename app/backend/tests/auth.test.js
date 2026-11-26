@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { firmar, verificar, requiereRol } = require('../src/middleware/auth');
-const { validarCP } = require('../src/routes/codigosPostales');
+const { SERIE } = require('../src/routes/banxico');
 
 // Simula la respuesta de Express para capturar el código y el cuerpo enviados
 function respuesta() {
@@ -52,11 +52,6 @@ test('requiereRol bloquea un rol no autorizado', () => {
   assert.equal(res.codigo, 403);
 });
 
-// Prueba los límites del formato de código postal de cinco dígitos
-test('validarCP acepta solo cinco digitos', () => {
-  assert.equal(validarCP('77500'), true);
-  assert.equal(validarCP('99999'), true);
-  assert.equal(validarCP('abc'), false);
-  assert.equal(validarCP('7750'), false);
-  assert.equal(validarCP('775000'), false);
+test('la serie externa de Banxico es SF43718', () => {
+  assert.equal(SERIE, 'SF43718');
 });

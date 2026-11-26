@@ -11,7 +11,7 @@ Este documento reúne la evidencia solicitada por la unidad II de Programación 
 | viewport y diseño adaptable | `meta viewport` y media queries para escritorio, tablet y móvil. | `app/frontend/index.html` línea 6; `app/frontend/src/diseno.css` líneas 911-1015. |
 | Etiquetas asociadas a controles | Todos los campos usan `label htmlFor` con el `id` del control. | `app/frontend/src/App.jsx` líneas 101-105, 230, 323, 337-363, 575 y 694. |
 | Navegación identificada | `nav` con `aria-label="Navegación principal"` y enlace de salto al contenido. | `app/frontend/src/App.jsx` líneas 125, 202 y 224. |
-| Mensajes accesibles | Errores con `role="alert"`; resultados de postal con `role="status"`; estados de stock con texto visible. | `app/frontend/src/App.jsx` líneas 35, 205, 227, 376, 445, 579, 605, 698 y 700. |
+| Mensajes accesibles | Errores con `role="alert"`; resultado del tipo de cambio con `role="status"`; estados de stock con texto visible. | `app/frontend/src/App.jsx` línea 32 y bloque `Reportes` desde la línea 650. |
 | Foco visible | Regla `button:focus-visible` para teclado. | `app/frontend/src/styles.css` línea 374. |
 | Movimiento reducido | `@media (prefers-reduced-motion: reduce)` desactiva transiciones. | `app/frontend/src/styles.css` línea 806 y `app/frontend/src/diseno.css` línea 1011. |
 | Tablas comprensibles | `caption`, `thead`, `th scope="col"` y celdas numéricas alineadas. | `app/frontend/src/App.jsx` líneas 380-387, 449-457, 609-616 y 716-739. |
@@ -35,14 +35,14 @@ El árbol que React monta en `#root` queda organizado así:
       ├─ .card-header (eyebrow, h3, texto-ayuda)
       ├─ form / input / select / label
       ├─ table > caption + thead + tbody
-      └─ .total-caja / .postal-resultado
+       └─ .total-caja / .tipo-cambio
 ```
 
 Las vistas no son páginas independientes: son secciones que React muestra u oculta según el estado `vista` (`productos`, `inventario`, `pos`, `reportes`). El `main#contenido` existe tanto en la pantalla de login como en la sesión iniciada, y el enlace `.salto` permite llegar a él con teclado.
 
 ## 3. Comportamiento dinámico
 
-- `usuario`, `vista`, `sucursal`, `mensaje`, `q`, `carrito` y `cp` viven en `useState`.
+- `usuario`, `vista`, `sucursal`, `mensaje`, `q`, `carrito` y `tc` viven en `useState`.
 - Un `useEffect` reconcilia la sesión con `GET /api/auth/me`.
 - Otro `useEffect` carga `/sucursales` después del login.
 - La búsqueda de productos usa un `useEffect` con retardo y llama a `/productos?q=...`.
@@ -53,7 +53,7 @@ Las vistas no son páginas independientes: son secciones que React muestra u ocu
 
 - `npm run build` en `app/frontend` termina sin errores.
 - `node --check` en los 11 archivos del backend termina sin errores.
-- `npm test` en `app/backend` ejecuta 4 pruebas de token, roles y código postal; todas pasan.
+- `npm test` en `app/backend` ejecuta 4 pruebas de token, roles y serie de Banxico; todas pasan.
 - Selenium comprobó: acentos reales en el selector de sucursales, sin desbordes en 1440 px ni en 390 px, consola sin errores y estilos calculados de la paleta naranja/carbón y las tres fuentes.
 - Verificación de accesibilidad: `a.salto` recibe el foco y lleva a `#contenido`; `main#contenido` existe en login y en la sesión iniciada; `nav.barra` conserva `aria-label`, hay `th[scope="col"]` y la consola queda sin errores.
 - Capturas relacionadas: `docs/evidencias/capturas/01-login.png`, `03-busqueda-en-vivo.png`, `05-inventario.png`, `07-pos-carrito.png` y `11-login-movil.png`.

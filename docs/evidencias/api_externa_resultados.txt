@@ -1,14 +1,17 @@
-Evidencia real de API externa, sesion y roles - 2026-11-25 18:00
+Evidencia real de API externa Banxico SIE, sesión y roles - 2026-11-26
 Backend: http://localhost:3001 | Base: PostgreSQL 18 en localhost:5433
+Token Bmx-Token configurado en app/backend/.env (valor no mostrado)
 
-GET /api/codigos-postales/77500 -> 200
-{"ok":true,"cp":"77500","estado":"Quintana Roo","municipio":"Benito Juárez","total":16,"asentamientos":[{"nombre":"Cancún Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Juárez","tipo":"Puerto","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Residencial La Cascada","tipo":"Condominio","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Supermanzana 1 Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Supermanzana 2 Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Supermanzana 20 Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Supermanzana 22 Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"},{"nombre":"Supermanzana 23 Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"}]}
+GET /api/banxico/tipo-cambio -> 200
+{"ok":true,"serie":"SF43718","fecha":"25/11/2026","valor":"19.7040"}
 
-GET /api/codigos-postales/99999 -> 404
-{"ok":false,"error":"Código postal no encontrado"}
+Serie SF43718: Pesos por Dólar. FIX., dato oportuno.
+Fuente: https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/oportuno
 
-GET /api/codigos-postales/abc -> 400
-{"ok":false,"error":"El código postal debe tener 5 dígitos"}
+Prueba con token inválido (servicio auxiliar en :3002) -> 400
+{"ok":false,"aviso":"Banxico rechazó la consulta","detalle":"HTTP 400"}
+
+El navegador nunca recibe el token: la ruta Express lo envía en el header Bmx-Token. Los errores de red se normalizan con 503 y el sistema sigue funcionando.
 
 POST /api/auth/login [administrador] -> 200 rol=administrador token=eyJpZF91c3Vh...
   GET /api/productos -> 200 filas=6

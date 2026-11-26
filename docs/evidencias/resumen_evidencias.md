@@ -92,15 +92,15 @@ Bitácora: eventos `UPDATE` de inventario en origen/destino y `TRASPASO` con id 
 
 ## 4. Consumo de API externa (Web U.III)
 
-Decisión final: la historia original pedía Banxico SIE, pero se sustituyó por la API de códigos postales Postali para obtener una respuesta real sin token.
+Decisión final: se conservó Banxico SIE. El backend consulta la serie SF43718 (Pesos por Dólar. FIX.) con el token en el header `Bmx-Token` y muestra el dato oportuno en Reportes.
 
-Prueba real (`GET /api/codigos-postales/77500`):
+Prueba real (`GET /api/banxico/tipo-cambio`):
 ```json
-{"ok":true,"cp":"77500","estado":"Quintana Roo","municipio":"Benito Juárez","total":16,"asentamientos":[{"nombre":"Cancún Centro","tipo":"Colonia","ciudad":"Cancún","zona":"Urbano"}]}
+{"ok":true,"serie":"SF43718","fecha":"25/11/2026","valor":"19.7040"}
 ```
-Casos de error verificados: `99999` → 404 `Código postal no encontrado`; `abc` → 400 `El código postal debe tener 5 dígitos`. Salida completa en `api_externa_resultados.txt`; capturas `09-api-codigo-postal.png` y `10-api-cp-error.png`.
+Caso de error verificado: token inválido → 400 `Banxico rechazó la consulta`, con detalle `HTTP 400`. Salida completa en `api_externa_resultados.txt`; capturas `09-api-banxico.png` y `10-api-banxico-movil.png`.
 
-El backend nunca expone la URL directamente al navegador: la ruta Express valida, aplica timeout de 8 s y normaliza errores 502/503. Conclusión: el sistema **no se cae** si la API falla ni requiere credenciales externas.
+El navegador nunca recibe el token: la ruta Express lo guarda en `app/backend/.env`, aplica timeout de 8 s y normaliza errores 400/502/503. Conclusión: el sistema **no se cae** si la API falla y cumple literalmente el consumo de servicio web externo.
 
 ## 5. Recuperación a un punto en el tiempo — PITR (U.IV BD)
 
@@ -129,9 +129,9 @@ Demostración con tres contenedores PostgreSQL 18.6 en la red Docker `dist_net`;
 - **Limitación real:** `postgres_fdw` no permite `PREPARE TRANSACTION` sobre tablas foráneas (`cannot PREPARE a transaction that has operated on postgres_fdw foreign tables`); el 2PC se hizo con dos transacciones preparadas explícitas (coordinador manual).
 
 ## 7. Capturas y evidencias finales (2026-11-25)
-- `capturas/01-login.png` a `capturas/12-github-repo.png`: login, catálogo, búsqueda en vivo, formulario de producto, inventario, POS, carrito, reportes, API postal, error de CP, vista móvil y repositorio.
+- `capturas/01-login.png` a `capturas/12-github-repo.png`: login, catálogo, búsqueda en vivo, formulario de producto, inventario, POS, carrito, reportes, API Banxico, vista móvil de Banxico, login móvil y repositorio.
 - `capturas/13-concurrencia-sesiones.png`: salidas reales de las dos sesiones, el bloqueo en `pg_stat_activity` y la verificación final.
-- `api_externa_resultados.txt`: respuesta 200/404/400 y comprobación de roles (administrador y gerente acceden a reportes; cajero recibe 403).
+- `api_externa_resultados.txt`: respuesta 200 de Banxico, error 400 con token inválido y comprobación de roles (administrador y gerente acceden a reportes; cajero recibe 403).
 - `live_concurrencia_*.txt`: transcripciones de la repetición de concurrencia.
 - `explain_resultados.txt`, `almacenamiento_resultados.txt`, `traspaso_resultados.txt`, `pitr_resultados.txt` y `distribuida_resultados.txt`: evidencias de ejecuciones anteriores, ya incorporadas al documento final.
 - Estado GitHub: 18/18 issues cerrados y tablero con 18 tarjetas en Done.

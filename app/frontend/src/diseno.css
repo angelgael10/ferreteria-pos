@@ -871,19 +871,7 @@ tbody tr:hover {
   background: linear-gradient(135deg, rgba(255, 253, 249, 0.97), rgba(248, 244, 236, 0.88));
 }
 
-.formulario-postal {
-  display: grid;
-  grid-template-columns: 170px auto auto;
-  align-items: end;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.formulario-postal label {
-  margin-bottom: 0;
-}
-
-.postal-resultado {
+.tipo-cambio {
   margin-top: 16px;
   padding: 17px 19px;
   background: #f8f4ec;
@@ -892,21 +880,13 @@ tbody tr:hover {
   box-shadow: none;
 }
 
-.postal-resultado p {
+.tipo-cambio p {
   margin: 0;
 }
 
-.postal-resultado p:first-child {
+.tipo-cambio p:first-child {
   font-family: "Iowan Old Style", Georgia, serif;
   font-size: 1.1rem;
-}
-
-.lista-asentamientos {
-  columns: 2;
-  margin: 12px 0 0;
-  padding-left: 20px;
-  color: var(--suave);
-  font-size: 0.82rem;
 }
 
 @media (max-width: 980px) {
@@ -982,8 +962,7 @@ tbody tr:hover {
     flex-direction: column;
   }
 
-  .fila,
-  .formulario-postal {
+  .fila {
     grid-template-columns: 1fr;
   }
 
@@ -994,10 +973,6 @@ tbody tr:hover {
   .producto-item button {
     grid-column: 1 / -1;
     justify-self: end;
-  }
-
-  .lista-asentamientos {
-    columns: 1;
   }
 
   .marca-icono {

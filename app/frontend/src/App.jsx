@@ -647,65 +647,46 @@ function POS({ sucursal, nombreSucursal }) {
   );
 }
 
-// Reportes de ventas, existencias consolidadas y consulta de código postal.
 function Reportes() {
   const [ventas, setVentas] = useState([]);
   const [existencias, setExistencias] = useState([]);
   const [errorVentas, setErrorVentas] = useState("");
   const [errorExistencias, setErrorExistencias] = useState("");
   const [intentos, setIntentos] = useState(0);
-  const [cp, setCp] = useState("77500");
-  const [postal, setPostal] = useState(null);
-  const [errorPostal, setErrorPostal] = useState("");
-  const [consultando, setConsultando] = useState(false);
+  const [tc, setTc] = useState(null);
+  const [errorTC, setErrorTC] = useState("");
+  const [intentosTC, setIntentosTC] = useState(0);
 
-  // Carga ambos consolidados y se repite al usar el botón Reintentar.
   useEffect(() => {
     api("/reportes/ventas-sucursal").then((data) => { setVentas(data); setErrorVentas(""); }).catch((err) => setErrorVentas(err.message));
     api("/reportes/existencias-consolidado").then((data) => { setExistencias(data); setErrorExistencias(""); }).catch((err) => setErrorExistencias(err.message));
   }, [intentos]);
 
-  // Valida cinco dígitos y consulta el servicio externo de SEPOMEX.
-  async function consultarCP(e) {
-    e.preventDefault();
-    setErrorPostal("");
-    setPostal(null);
-    if (!/^\d{5}$/.test(cp)) {
-      setErrorPostal("Escribe un código postal de 5 dígitos.");
-      return;
-    }
-    setConsultando(true);
-    try {
-      setPostal(await api("/codigos-postales/" + cp));
-    } catch (err) {
-      setErrorPostal(err.message);
-    } finally {
-      setConsultando(false);
-    }
-  }
+  useEffect(() => {
+    api("/banxico/tipo-cambio")
+      .then((data) => {
+        if (!data.ok) throw new Error(data.aviso || "No se pudo consultar Banxico");
+        setTc(data);
+        setErrorTC("");
+      })
+      .catch((err) => setErrorTC(err.message));
+  }, [intentosTC]);
 
   return (
     <div className="reportes-grid">
       <section className="card reporte-card">
-        <span className="eyebrow">Código postal</span>
-        <h3>Consulta de código postal</h3>
-        <p className="texto-ayuda">Datos reales de SEPOMEX servidos por la API Postali, sin token.</p>
-        <form className="formulario-postal" onSubmit={consultarCP}>
-          <label htmlFor="cp">Código postal</label>
-          <input id="cp" inputMode="numeric" pattern="[0-9]{5}" maxLength="5" value={cp} onChange={(e) => setCp(e.target.value.replace(/\D/g, ""))} required />
-          <button type="submit" disabled={consultando}>{consultando ? "Consultando..." : "Consultar"}</button>
-        </form>
-        {errorPostal && <p className="alerta alerta-error" role="alert">{errorPostal}</p>}
-        {postal && (
-          <div className="postal-resultado" role="status">
-            <p><strong>{postal.cp}</strong> · {postal.estado} · {postal.municipio}</p>
-            <p className="texto-ayuda">{postal.total} asentamiento(s) encontrado(s)</p>
-            <ul className="lista-asentamientos">
-              {postal.asentamientos.map((a) => <li key={a.nombre}>{a.nombre} ({a.tipo})</li>)}
-            </ul>
+        <span className="eyebrow">Servicio externo</span>
+        <h3>Tipo de cambio Banxico</h3>
+        <p className="texto-ayuda">Serie SF43718 · pesos por dólar, dato oportuno.</p>
+        <ErrorDatos error={errorTC} onReintentar={() => setIntentosTC((n) => n + 1)} />
+        {tc && !errorTC && (
+          <div className="tipo-cambio" role="status">
+            <p><strong>{tc.valor}</strong> MXN por USD</p>
+            <p className="texto-ayuda">Fecha: {tc.fecha}</p>
           </div>
         )}
       </section>
+
       <section className="card reporte-card">
         <span className="eyebrow">Ventas consolidadas</span>
         <h3>Ventas consolidadas</h3>

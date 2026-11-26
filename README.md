@@ -11,7 +11,7 @@ Proyecto integrador (Programación Web + Bases de Datos). Sucursales: Cancún, P
 - **Base de datos:** PostgreSQL 18 en Docker
 - **Backend:** Node.js + Express (API/MVC, sesión HMAC y roles)
 - **Frontend:** React + Vite
-- **API externa:** Postali (`https://postali.app`) para códigos postales de México, sin token
+- **API externa:** Banxico SIE, serie SF43718 (pesos por dólar), con token `Bmx-Token`
 - **Contenedores:** Docker Compose
 
 ## Estructura
@@ -37,7 +37,7 @@ docker compose ps
 docker exec ferreteria_db psql -U ferreteria -d ferreteria -c "SELECT version();"
 ```
 
-PostgreSQL queda en `localhost:5433`, base y usuario `ferreteria`. El backend usa `DB_PASSWORD`, `SESSION_SECRET` y `POSTAL_API_BASE` (ver `.env.example`; no publicar `.env`).
+PostgreSQL queda en `localhost:5433`, base y usuario `ferreteria`. El backend usa `DB_PASSWORD`, `SESSION_SECRET`, `BANXICO_TOKEN` y `BANXICO_SERIE` (ver `.env.example`; no publicar `.env`).
 
 ## Ver y editar la base de datos con Adminer
 ```bash
@@ -78,11 +78,11 @@ Backend: `http://localhost:3001`. Frontend: `http://localhost:5173` (proxy `/api
 El login devuelve un token HMAC con vigencia de 8 horas. Los reportes solo están disponibles para administrador y gerente.
 
 ## API externa
-`GET /api/codigos-postales/:cp` consulta Postali y devuelve estado, municipio y asentamientos. Verificado con `77500` (Quintana Roo, Benito Juárez, 16 asentamientos), `99999` → 404 y `abc` → 400.
+`GET /api/banxico/tipo-cambio` consulta la serie SF43718 de Banxico SIE y devuelve fecha y valor USD/MXN. Verificado con token configurado: `25/11/2026` → `19.7040`; token inválido → 400 controlado.
 
 ## Evidencias ejecutadas
 - 2026-11-17: concurrencia del último artículo, `EXPLAIN`/índices/almacenamiento, traspaso atómico `T-DEMO-01`, PITR y BD distribuida (poda, réplica, FDW y 2PC).
-- 2026-11-25: sesión con token y roles, alta/edición de producto, API de códigos postales, 13 capturas del frontend y repetición de la concurrencia con dos sesiones `V-CONC-LIVE-A`/`V-CONC-LIVE-B`.
+- 2026-11-25: sesión con token y roles, alta/edición de producto, consulta real de Banxico SIE, 13 capturas del frontend y repetición de la concurrencia con dos sesiones `V-CONC-LIVE-A`/`V-CONC-LIVE-B`.
 
 Detalle en `docs/evidencias/resumen_evidencias.md`, `api_externa_resultados.txt`, `live_concurrencia_*.txt` y `capturas/`.
 

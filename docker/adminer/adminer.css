@@ -1,16 +1,16 @@
 /* adminer.css: tema local de Adminer con una paleta cálida y equilibrada. */
 :root {
-  --bg: #f5f2ec;
+  --bg: #f7f5f0;
   --surface: #ffffff;
-  --soft: #fbf9f6;
-  --ink: #4a3527;
-  --muted: #7c6a5c;
-  --line: #e5dfd6;
-  --accent: #d95d0e;
-  --accent-bright: #f08a24;
-  --accent-soft: #fff1e5;
-  --dark: #6b3f24;
-  --dark-2: #8a4f28;
+  --soft: #fbfaf7;
+  --ink: #55514b;
+  --muted: #7c766d;
+  --line: #e6e1d7;
+  --accent: #5f7a59;
+  --accent-bright: #7f9a78;
+  --accent-soft: #edf3ea;
+  --dark: #4f6249;
+  --dark-2: #6c8064;
 }
 
 * {
@@ -25,8 +25,8 @@ body {
   padding: 28px;
   color: var(--ink);
   background:
-    radial-gradient(circle at 12% 8%, rgba(240, 138, 36, 0.12), transparent 32%),
-    radial-gradient(circle at 88% 92%, rgba(107, 63, 36, 0.08), transparent 34%),
+    radial-gradient(circle at 12% 8%, rgba(127, 154, 120, 0.12), transparent 32%),
+    radial-gradient(circle at 88% 92%, rgba(95, 122, 89, 0.08), transparent 34%),
     var(--bg);
   font-family: Aptos, "Segoe UI", sans-serif;
   font-size: 14px;
@@ -50,7 +50,7 @@ body {
   background: var(--soft);
   border: 1px solid var(--line);
   border-radius: 18px;
-  box-shadow: 0 12px 28px rgba(107, 63, 36, 0.07);
+  box-shadow: 0 12px 28px rgba(95, 122, 89, 0.07);
 }
 
 #menu h1 {
@@ -213,7 +213,7 @@ body:has(#tables) #menu ul#tables li a.structure {
   background: rgba(255, 255, 255, 0.97);
   border: 1px solid var(--line);
   border-radius: 28px;
-  box-shadow: 0 24px 60px rgba(107, 63, 36, 0.09);
+  box-shadow: 0 24px 60px rgba(95, 122, 89, 0.09);
 }
 
 #content::before {
@@ -223,7 +223,7 @@ body:has(#tables) #menu ul#tables li a.structure {
   right: 36px;
   left: 36px;
   height: 5px;
-  background: linear-gradient(90deg, var(--accent-bright), var(--accent), #f6b26b);
+  background: linear-gradient(90deg, var(--accent-bright), var(--accent), #9bb493);
   border-radius: 0 0 999px 999px;
 }
 
@@ -298,7 +298,7 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  outline: 3px solid rgba(240, 138, 36, 0.2);
+  outline: 3px solid rgba(127, 154, 120, 0.2);
   border-color: var(--accent);
 }
 
@@ -315,7 +315,7 @@ button {
   background: linear-gradient(135deg, var(--accent-bright), var(--accent));
   border: 0;
   border-radius: 999px;
-  box-shadow: 0 10px 20px rgba(217, 93, 14, 0.2);
+  box-shadow: 0 10px 20px rgba(95, 122, 89, 0.2);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -325,7 +325,7 @@ button {
 input[type="submit"]:hover,
 button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 24px rgba(217, 93, 14, 0.26);
+  box-shadow: 0 14px 24px rgba(95, 122, 89, 0.26);
 }
 
 #lang input[type="submit"] {
@@ -424,7 +424,7 @@ pre {
 }
 
 .error {
-  color: #8f3b0b;
+  color: var(--accent);
   background: var(--accent-soft);
   border: 1px solid var(--accent-bright);
 }

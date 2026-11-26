@@ -39,6 +39,12 @@ docker exec ferreteria_db psql -U ferreteria -d ferreteria -c "SELECT version();
 
 PostgreSQL queda en `localhost:5433`, base y usuario `ferreteria`. El backend usa `DB_PASSWORD`, `SESSION_SECRET` y `POSTAL_API_BASE` (ver `.env.example`; no publicar `.env`).
 
+## Ver y editar la base de datos con Adminer
+```bash
+docker compose up -d adminer
+```
+Abre `http://localhost:8081` y usa: sistema `PostgreSQL`, servidor `db`, usuario `ferreteria`, contraseña la de `POSTGRES_PASSWORD` en `.env`, base `ferreteria`. Adminer solo agrega una interfaz web; no cambia la aplicación ni los datos por sí solo.
+
 ## Ejecución de la aplicación
 ```bash
 cd app/backend

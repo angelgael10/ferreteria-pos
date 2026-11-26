@@ -1,14 +1,14 @@
 /* adminer.css: tema local de Adminer con una paleta cálida y equilibrada. */
 :root {
-  --bg: #faf7f2;
+  --bg: #fbf8f3;
   --surface: #ffffff;
-  --soft: #fdfbf8;
-  --ink: #5b514a;
-  --muted: #7d726a;
+  --soft: #f7f2eb;
+  --ink: #000000;
+  --muted: #000000;
   --line: #e9e1d9;
   --accent: #a85f33;
   --accent-bright: #b96b3d;
-  --accent-soft: #fdf1e8;
+  --accent-soft: #f7e7d8;
   --dark: #7a4a2f;
   --dark-2: #94603f;
 }
@@ -74,6 +74,11 @@ body {
   font-weight: 400;
 }
 
+#menu .version a,
+#version a {
+  color: var(--ink);
+}
+
 #lang {
   display: flex;
   align-items: center;
@@ -136,7 +141,7 @@ body:has(#tables) #menu p.links {
 
 body:has(#tables) #menu p.links a {
   padding: 5px 10px;
-  color: var(--accent);
+  color: var(--ink);
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -187,7 +192,7 @@ body:has(#tables) #menu ul#tables li a.select {
 body:has(#tables) #menu ul#tables li a.select::after {
   content: "›";
   padding: 0 0 0 1px;
-  color: var(--accent);
+  color: var(--ink);
   font-size: 16px;
   font-weight: 700;
   line-height: 1;
@@ -252,12 +257,12 @@ h3 {
 }
 
 a {
-  color: var(--accent);
+  color: var(--ink);
   text-decoration: none;
 }
 
 a:hover {
-  color: var(--accent-bright);
+  color: var(--ink);
   text-decoration: underline;
 }
 
@@ -424,7 +429,7 @@ pre {
 }
 
 .error {
-  color: var(--accent);
+  color: var(--ink);
   background: var(--accent-soft);
   border: 1px solid var(--accent-bright);
 }

@@ -43,7 +43,19 @@ PostgreSQL queda en `localhost:5433`, base y usuario `ferreteria`. El backend us
 ```bash
 docker compose up -d adminer
 ```
-Abre `http://localhost:8081` y usa: sistema `PostgreSQL`, servidor `db`, usuario `ferreteria`, contraseña la de `POSTGRES_PASSWORD` en `.env`, base `ferreteria`. Adminer solo agrega una interfaz web; no cambia la aplicación ni los datos por sí solo.
+
+Panel local con enlaces y consultas listas: `docs/adminer/index.html`.
+
+| Dato | Valor |
+|---|---|
+| URL | `http://localhost:8081` |
+| Sistema | `PostgreSQL` |
+| Servidor | `db` |
+| Usuario | `ferreteria` |
+| Contraseña | la de `POSTGRES_PASSWORD` en `.env` |
+| Base | `ferreteria` |
+
+Adminer solo agrega una interfaz web; no cambia la aplicación ni los datos por sí solo. Para registrar ventas o traspasos usa la aplicación.
 
 ## Ejecución de la aplicación
 ```bash

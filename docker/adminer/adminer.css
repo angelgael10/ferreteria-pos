@@ -1,0 +1,150 @@
+/* adminer.css: estilo local de Adminer con la paleta de la aplicación. */
+body {
+  background: #f6f3ee;
+  color: #1f2124;
+  font-family: Aptos, "Segoe UI", sans-serif;
+  font-size: 14px;
+  margin: 24px;
+}
+
+#content {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 28px 32px 36px;
+  background: #ffffff;
+  border: 1px solid #dedbd5;
+  border-radius: 24px;
+  box-shadow: 0 18px 40px rgba(31, 33, 36, 0.08);
+}
+
+h1,
+h2,
+h3 {
+  color: #1f2124;
+  font-family: "Palatino Linotype", Palatino, Georgia, serif;
+  font-weight: 600;
+}
+
+h1 {
+  margin: 0 0 18px;
+  font-size: 28px;
+}
+
+a {
+  color: #c94d00;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #f96302;
+  text-decoration: underline;
+}
+
+fieldset {
+  margin: 0 0 18px;
+  padding: 20px;
+  background: #faf8f5;
+  border: 1px solid #dedbd5;
+  border-radius: 18px;
+}
+
+legend {
+  padding: 0 8px;
+  color: #1f2124;
+  font-family: "Palatino Linotype", Palatino, Georgia, serif;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+label {
+  color: #3b3f45;
+  font-weight: 600;
+}
+
+input,
+select,
+textarea {
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 9px 12px;
+  color: #1f2124;
+  background: #ffffff;
+  border: 1px solid #dedbd5;
+  border-radius: 10px;
+  font: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid rgba(249, 99, 2, 0.18);
+  border-color: #f96302;
+}
+
+input[type="submit"],
+button {
+  padding: 10px 18px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #f96302, #c94d00);
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover,
+button:hover {
+  background: linear-gradient(135deg, #ff8a2b, #f96302);
+}
+
+table {
+  width: 100%;
+  margin: 12px 0 20px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  border: 1px solid #dedbd5;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #f1eee8;
+}
+
+th {
+  color: #ffffff;
+  background: #1f2124;
+  font-weight: 600;
+}
+
+tr:last-child td {
+  border-bottom: 0;
+}
+
+tr:nth-child(even) td {
+  background: #faf8f5;
+}
+
+code,
+pre {
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.message,
+.error,
+.notice {
+  padding: 12px 16px;
+  border-radius: 12px;
+}
+
+.error {
+  color: #8f2f00;
+  background: #fff0e2;
+  border: 1px solid #f96302;
+}

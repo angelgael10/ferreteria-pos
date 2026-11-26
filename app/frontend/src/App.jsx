@@ -42,7 +42,7 @@ function Encabezado({ usuario }) {
         <div className="marca-icono" aria-hidden="true">F</div>
         <div>
           <h1>Ferretería POS</h1>
-          <p className="subtitulo">Inventario y ventas por sucursal</p>
+          <p className="subtitulo">Inventario y ventas de la sucursal</p>
         </div>
       </div>
       {usuario && (
@@ -285,7 +285,7 @@ function Productos({ puedeCrear }) {
         <div>
           <span className="eyebrow">Catálogo</span>
           <h3>Catálogo de productos</h3>
-          <p className="texto-ayuda">Búsqueda en vivo por nombre, SKU o etiqueta.</p>
+          <p className="texto-ayuda">Búsqueda en vivo: nombre, SKU o etiqueta.</p>
         </div>
         <div className="acciones-header">
           <span className="contador">{items.length} resultado(s)</span>
@@ -410,7 +410,7 @@ function Inventario({ sucursal, nombreSucursal }) {
       <div className="card-header">
         <div>
           <span className="eyebrow">Inventario</span>
-          <h3>Existencias por sucursal</h3>
+          <h3>Existencias de la sucursal</h3>
           <p className="texto-ayuda">Stock actual y mínimo configurado para {nombreSucursal(sucursal)}.</p>
         </div>
         <span className="contador">{items.length} registro(s)</span>
@@ -672,13 +672,13 @@ function Reportes() {
         )}
       </section>
       <section className="card reporte-card">
-        <span className="eyebrow">Ventas por sucursal</span>
-        <h3>Ventas por sucursal</h3>
+        <span className="eyebrow">Ventas consolidadas</span>
+        <h3>Ventas consolidadas</h3>
         <ErrorDatos error={errorVentas} onReintentar={() => setIntentos((n) => n + 1)} />
         {ventas.length === 0 && !errorVentas ? <p className="vacio">Sin ventas registradas.</p> : (
           <div className="tabla-scroll">
             <table>
-              <caption>Ventas consolidadas por sucursal</caption>
+              <caption>Ventas consolidadas de cada sucursal</caption>
               <thead><tr><th scope="col">Sucursal</th><th scope="col" className="numero"># Ventas</th><th scope="col" className="numero">Total vendido</th></tr></thead>
               <tbody>
                 {ventas.map((v) => (
@@ -700,7 +700,7 @@ function Reportes() {
         {existencias.length === 0 && !errorExistencias ? <p className="vacio">Sin existencias registradas.</p> : (
           <div className="tabla-scroll">
             <table>
-              <caption>Stock total por producto en todas las sucursales</caption>
+              <caption>Stock total de cada producto en todas las sucursales</caption>
               <thead><tr><th scope="col">SKU</th><th scope="col">Producto</th><th scope="col" className="numero">Stock total</th></tr></thead>
               <tbody>
                 {existencias.map((e) => (

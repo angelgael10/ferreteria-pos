@@ -33,43 +33,44 @@ body {
   line-height: 1.5;
 }
 
-/* Barra superior: identidad del herramientero y selector de idioma. */
+/* Barra superior clara y compacta: solo lo necesario para empezar. */
 #menu {
   position: static;
   order: -1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 14px;
   flex-wrap: wrap;
   width: min(1120px, 100%);
   max-width: 1120px;
-  margin: 0 auto 18px;
-  padding: 16px 24px;
-  color: #ffffff;
-  background: linear-gradient(135deg, var(--dark) 0%, var(--dark-2) 100%);
-  border-radius: 22px;
-  box-shadow: 0 18px 38px rgba(32, 36, 42, 0.16);
+  margin: 0 auto 12px;
+  padding: 12px 18px;
+  color: var(--ink);
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(32, 36, 42, 0.07);
 }
 
 #menu h1 {
   margin: 0;
   font-family: "Palatino Linotype", Palatino, Georgia, serif;
-  font-size: 23px;
+  font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 
 #menu h1 a#h1 {
-  color: #ffffff;
+  color: var(--ink);
   text-decoration: none;
 }
 
 #menu .version {
-  margin-left: 8px;
-  color: #b9bec6;
+  margin-left: 6px;
+  color: var(--muted);
   font-family: Aptos, "Segoe UI", sans-serif;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 400;
 }
 
@@ -77,22 +78,22 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #dfe3e8;
-  font-size: 12px;
+  color: var(--muted);
+  font-size: 11px;
 }
 
 #lang select {
   width: auto;
-  min-width: 130px;
+  min-width: 120px;
 }
 
-/* Vista de base de datos: selector arriba, acciones en fila y tablas en tarjetas. */
+/* Vista de base de datos: selector corto, acciones en pastillas y tablas resumidas. */
 body:has(#tables) #menu {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 14px 20px;
-  padding: 22px 26px;
+  gap: 9px 14px;
+  padding: 12px 18px;
 }
 
 body:has(#tables) #menu h1 {
@@ -105,99 +106,101 @@ body:has(#tables) #menu form:has(#dbs) {
   grid-row: 1;
   justify-self: end;
   margin: 0;
-  padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 14px;
+  padding: 6px 10px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
 }
 
 body:has(#tables) #menu #dbs {
   margin: 0;
-  color: #dfe3e8;
-  font-size: 12px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+body:has(#tables) #menu #dbs br {
+  display: none;
 }
 
 body:has(#tables) #menu #dbs select {
-  min-width: 150px;
+  min-width: 130px;
 }
 
 body:has(#tables) #menu p.links {
   grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
 }
 
 body:has(#tables) #menu p.links a {
-  padding: 7px 13px;
-  color: #ffe0c8;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 5px 10px;
+  color: var(--accent);
+  background: #ffffff;
+  border: 1px solid var(--line);
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   text-decoration: none;
 }
 
 body:has(#tables) #menu p.links a:hover {
   color: #ffffff;
-  background: rgba(240, 138, 36, 0.22);
-  border-color: rgba(240, 138, 36, 0.45);
+  background: var(--accent);
+  border-color: var(--accent);
   text-decoration: none;
 }
 
 body:has(#tables) #menu ul#tables {
   grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 9px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 body:has(#tables) #menu ul#tables li {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-height: 44px;
-  padding: 8px 11px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 13px;
+  gap: 6px;
+  min-height: 0;
+  padding: 5px 9px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
 }
 
 body:has(#tables) #menu ul#tables li:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(240, 138, 36, 0.4);
+  background: var(--accent-soft);
+  border-color: var(--accent-bright);
 }
 
 body:has(#tables) #menu ul#tables li a.select {
+  order: 2;
   padding: 0;
   font-size: 0;
 }
 
 body:has(#tables) #menu ul#tables li a.select::after {
-  content: "Ver";
-  padding: 4px 9px;
-  color: #ffd7b8;
-  background: rgba(240, 138, 36, 0.18);
-  border: 1px solid rgba(240, 138, 36, 0.35);
-  border-radius: 999px;
-  font-size: 11px;
+  content: "›";
+  padding: 0 0 0 1px;
+  color: var(--accent);
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 body:has(#tables) #menu ul#tables li a.structure {
+  order: 1;
   min-width: 0;
-  color: #ffffff;
+  color: var(--ink);
   overflow-wrap: anywhere;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  text-align: right;
+  text-align: left;
   text-decoration: none;
 }
 
@@ -428,14 +431,14 @@ pre {
 
 @media (max-width: 720px) {
   body { padding: 14px; }
-  #menu { padding: 14px 18px; }
+  #menu { padding: 10px 14px; }
   #content { padding: 30px 20px; border-radius: 20px; }
   #content::before { left: 20px; right: 20px; }
   #content table.layout th { width: auto; padding-bottom: 4px; text-align: left; }
   #content table.layout td { padding-top: 0; }
   #content table.layout tr { display: block; }
   #content form > p { flex-direction: column; }
-  body:has(#tables) #menu { grid-template-columns: 1fr; padding: 18px; }
+  body:has(#tables) #menu { grid-template-columns: 1fr; padding: 12px 14px; }
   body:has(#tables) #menu form:has(#dbs) { justify-self: start; }
-  body:has(#tables) #menu ul#tables { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body:has(#tables) #menu ul#tables { justify-content: flex-start; }
 }

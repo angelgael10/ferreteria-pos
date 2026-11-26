@@ -27,6 +27,7 @@ services:
       ADMINER_DEFAULT_SERVER: db
     volumes:
       - ./docker/adminer/adminer.css:/var/www/html/adminer.css:ro
+      - ./docker/adminer/index.php:/var/www/html/index.php:ro
 
 volumes:
   pgdata:

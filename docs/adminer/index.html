@@ -11,14 +11,14 @@
       --bg: #f5f2ec;
       --surface: #ffffff;
       --soft: #fbf9f6;
-      --ink: #22262b;
-      --muted: #71767e;
+      --ink: #4a3527;
+      --muted: #7c6a5c;
       --line: #e5dfd6;
       --accent: #d95d0e;
       --accent-bright: #f08a24;
       --accent-soft: #fff1e5;
-      --dark: #20242a;
-      --dark-2: #343a42;
+      --dark: #6b3f24;
+      --dark-2: #8a4f28;
     }
 
     * { box-sizing: border-box; }
@@ -30,7 +30,7 @@
       color: var(--ink);
       background:
         radial-gradient(circle at 10% 0%, rgba(240, 138, 36, 0.14), transparent 30%),
-        radial-gradient(circle at 90% 100%, rgba(32, 36, 42, 0.08), transparent 32%),
+        radial-gradient(circle at 90% 100%, rgba(107, 63, 36, 0.08), transparent 32%),
         var(--bg);
       font-family: Aptos, "Segoe UI", sans-serif;
     }
@@ -72,7 +72,7 @@
       align-items: center;
       gap: 8px;
       padding: 7px 12px;
-      color: #4b5563;
+      color: var(--muted);
       background: var(--soft);
       border: 1px solid var(--line);
       border-radius: 999px;
@@ -99,7 +99,7 @@
       color: #fff;
       background: linear-gradient(135deg, var(--dark) 0%, var(--dark-2) 100%);
       border-radius: 28px;
-      box-shadow: 0 22px 48px rgba(32, 36, 42, 0.16);
+      box-shadow: 0 22px 48px rgba(107, 63, 36, 0.16);
     }
     .eyebrow {
       display: inline-block;
@@ -118,7 +118,7 @@
       font-weight: 600;
       letter-spacing: -0.02em;
     }
-    .hero p { max-width: 620px; margin: 0; color: #d8dce1; }
+    .hero p { max-width: 620px; margin: 0; color: #f8e9dc; }
     .cta {
       flex: 0 0 auto;
       display: inline-flex;
@@ -152,7 +152,7 @@
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: 24px;
-      box-shadow: 0 14px 34px rgba(32, 36, 42, 0.06);
+      box-shadow: 0 14px 34px rgba(107, 63, 36, 0.06);
     }
     .card::before {
       content: "";
@@ -206,7 +206,7 @@
       margin: 0;
       padding: 15px 17px;
       overflow-x: auto;
-      color: #f5f2ec;
+      color: #fff7ef;
       background: var(--dark);
       border-radius: 16px;
       font-family: "Cascadia Code", Consolas, monospace;
@@ -288,7 +288,7 @@
 
       <section class="card">
         <div class="card-head">
-          <h2>Stock por sucursal</h2>
+          <h2>Existencias por sucursal</h2>
           <span class="index">02</span>
         </div>
         <p>Consulta las existencias actuales y el mínimo configurado.</p>

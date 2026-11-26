@@ -44,7 +44,7 @@ PostgreSQL queda en `localhost:5433`, base y usuario `ferreteria`. El backend us
 docker compose up -d adminer
 ```
 
-Panel local con enlaces y consultas listas: `docs/adminer/index.html`.
+Panel local con enlaces y consultas listas: `docs/adminer/index.html`. La interfaz de Adminer se abre en español de forma predeterminada.
 
 | Dato | Valor |
 |---|---|

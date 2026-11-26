@@ -3,14 +3,14 @@
   --bg: #f5f2ec;
   --surface: #ffffff;
   --soft: #fbf9f6;
-  --ink: #22262b;
-  --muted: #71767e;
+  --ink: #4a3527;
+  --muted: #7c6a5c;
   --line: #e5dfd6;
   --accent: #d95d0e;
   --accent-bright: #f08a24;
   --accent-soft: #fff1e5;
-  --dark: #20242a;
-  --dark-2: #343a42;
+  --dark: #6b3f24;
+  --dark-2: #8a4f28;
 }
 
 * {
@@ -26,7 +26,7 @@ body {
   color: var(--ink);
   background:
     radial-gradient(circle at 12% 8%, rgba(240, 138, 36, 0.12), transparent 32%),
-    radial-gradient(circle at 88% 92%, rgba(32, 36, 42, 0.08), transparent 34%),
+    radial-gradient(circle at 88% 92%, rgba(107, 63, 36, 0.08), transparent 34%),
     var(--bg);
   font-family: Aptos, "Segoe UI", sans-serif;
   font-size: 14px;
@@ -50,7 +50,7 @@ body {
   background: var(--soft);
   border: 1px solid var(--line);
   border-radius: 18px;
-  box-shadow: 0 12px 28px rgba(32, 36, 42, 0.07);
+  box-shadow: 0 12px 28px rgba(107, 63, 36, 0.07);
 }
 
 #menu h1 {
@@ -213,7 +213,7 @@ body:has(#tables) #menu ul#tables li a.structure {
   background: rgba(255, 255, 255, 0.97);
   border: 1px solid var(--line);
   border-radius: 28px;
-  box-shadow: 0 24px 60px rgba(32, 36, 42, 0.09);
+  box-shadow: 0 24px 60px rgba(107, 63, 36, 0.09);
 }
 
 #content::before {
@@ -278,7 +278,7 @@ legend {
 }
 
 label {
-  color: #3b3f45;
+  color: var(--ink);
   font-weight: 600;
 }
 

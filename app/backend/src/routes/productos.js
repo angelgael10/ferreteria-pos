@@ -3,12 +3,14 @@ const router = express.Router();
 const pool = require('../db/pool');
 const { requiereRol } = require('../middleware/auth');
 
+// Relación entre el tipo enviado por el cliente y la tabla hija donde se guarda
 const TABLAS = {
   herramienta: 'producto_herramienta',
   material: 'producto_material',
   electrico: 'producto_electrico',
 };
 
+// Normaliza y valida los campos compartidos por todos los tipos de producto
 function camposComunes(body) {
   const sku = typeof body.sku === 'string' ? body.sku.trim() : '';
   const nombre = typeof body.nombre === 'string' ? body.nombre.trim() : '';
@@ -28,6 +30,7 @@ function camposComunes(body) {
   };
 }
 
+// Lista los productos activos, con búsqueda opcional por nombre, SKU, etiquetas o códigos alternos
 router.get('/', requiereRol(), async (req, res, next) => {
   const { q } = req.query;
   try {
@@ -36,6 +39,7 @@ router.get('/', requiereRol(), async (req, res, next) => {
                       p.activo, tableoid::regclass AS tipo_tabla
                FROM producto p WHERE p.activo = TRUE`;
     const params = [];
+    // Arma dinámicamente el filtro de búsqueda cuando llega el parámetro q
     if (q) {
       params.push(`%${q}%`);
       sql += ` AND (p.nombre ILIKE $1 OR p.sku ILIKE $1
@@ -50,6 +54,7 @@ router.get('/', requiereRol(), async (req, res, next) => {
   }
 });
 
+// Alta de producto: valida tipo y SKU único, y graba en la tabla hija correspondiente dentro de una transacción
 router.post('/', requiereRol('administrador', 'gerente'), async (req, res, next) => {
   const client = await pool.connect();
   let enTransaccion = false;
@@ -57,6 +62,7 @@ router.post('/', requiereRol('administrador', 'gerente'), async (req, res, next)
     const datos = camposComunes(req.body || {});
     const tabla = TABLAS[req.body.tipo];
     if (!tabla) throw new Error('El tipo debe ser herramienta, material o eléctrico');
+    // Evita registrar un SKU duplicado antes de iniciar la transacción
     const existe = await client.query('SELECT 1 FROM producto WHERE sku = $1', [datos.sku]);
     if (existe.rowCount) throw new Error(`El SKU ${datos.sku} ya está registrado`);
     await client.query('BEGIN');
@@ -64,6 +70,7 @@ router.post('/', requiereRol('administrador', 'gerente'), async (req, res, next)
     const comunes = [datos.sku, datos.nombre, datos.descripcion, datos.precio_mxn, datos.unidad_medida, datos.etiquetas, datos.activo];
     let sql;
     let extra;
+    // Cada tipo aporta campos propios, por eso se elige el INSERT según la tabla
     if (tabla === 'producto_herramienta') {
       sql = `INSERT INTO producto_herramienta
              (sku, nombre, descripcion, precio_mxn, unidad_medida, etiquetas, activo, material_mango, tipo_herramienta, uso)
@@ -84,18 +91,22 @@ router.post('/', requiereRol('administrador', 'gerente'), async (req, res, next)
     await client.query('COMMIT');
     res.status(201).json({ ok: true, id_producto: r.rows[0].id_producto });
   } catch (err) {
+    // Anula la transacción ante cualquier fallo y distingue errores de validación de los internos
     if (enTransaccion) await client.query('ROLLBACK');
     if (/SKU|precio|nombre|tipo debe/.test(err.message)) return res.status(400).json({ error: err.message });
     next(err);
   } finally {
+    // Devuelve la conexión al grupo siempre, incluso si hubo error
     client.release();
   }
 });
 
+// Actualización transaccional de los datos comunes de un producto
 router.put('/:id', requiereRol('administrador', 'gerente'), async (req, res, next) => {
   const client = await pool.connect();
   let enTransaccion = false;
   try {
+    // Valida el identificador recibido en la URL antes de tocar la base de datos
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id <= 0) throw new Error('Identificador de producto inválido');
     const datos = camposComunes(req.body || {});
@@ -110,6 +121,7 @@ router.put('/:id', requiereRol('administrador', 'gerente'), async (req, res, nex
     await client.query('COMMIT');
     res.json({ ok: true, id_producto: id });
   } catch (err) {
+    // Deshace cambios parciales y reporta errores de validación o no encontrado como 400
     if (enTransaccion) await client.query('ROLLBACK');
     if (/SKU|precio|nombre|Producto no|Identificador/.test(err.message)) return res.status(400).json({ error: err.message });
     next(err);

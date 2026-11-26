@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const { firmar, verificar, requiereRol } = require('../src/middleware/auth');
 const { validarCP } = require('../src/routes/codigosPostales');
 
+// Simula la respuesta de Express para capturar el código y el cuerpo enviados
 function respuesta() {
   return {
     status(codigo) {
@@ -16,6 +17,7 @@ function respuesta() {
   };
 }
 
+// Comprueba que un token recién firmado sea aceptado y expire en req.usuario
 test('firmar y verificar aceptan un token valido', () => {
   const token = firmar({ id_usuario: 7, nombre: 'Gerente', rol: 'gerente', id_sucursal: 1 });
   const req = { headers: { authorization: `Bearer ${token}` } };
@@ -27,6 +29,7 @@ test('firmar y verificar aceptan un token valido', () => {
   assert.equal(req.usuario.rol, 'gerente');
 });
 
+// Un token manipulado debe rechazarse con 401 y no llamar al siguiente middleware
 test('verificar rechaza un token alterado', () => {
   const token = firmar({ id_usuario: 7, nombre: 'Gerente', rol: 'gerente', id_sucursal: 1 });
   const alterado = `${token.slice(0, -1)}${token.at(-1) === 'a' ? 'b' : 'a'}`;
@@ -38,6 +41,7 @@ test('verificar rechaza un token alterado', () => {
   assert.equal(res.codigo, 401);
 });
 
+// Verifica que requiereRol devuelva 403 para un perfil no autorizado
 test('requiereRol bloquea un rol no autorizado', () => {
   const token = firmar({ id_usuario: 8, nombre: 'Cajero', rol: 'cajero', id_sucursal: 1 });
   const req = { headers: { authorization: `Bearer ${token}` } };
@@ -48,6 +52,7 @@ test('requiereRol bloquea un rol no autorizado', () => {
   assert.equal(res.codigo, 403);
 });
 
+// Prueba los límites del formato de código postal de cinco dígitos
 test('validarCP acepta solo cinco digitos', () => {
   assert.equal(validarCP('77500'), true);
   assert.equal(validarCP('99999'), true);

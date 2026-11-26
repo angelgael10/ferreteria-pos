@@ -1,18 +1,23 @@
 import { useEffect, useState } from "react";
 import { api, guardarSesion, leerSesion, limpiarSesion } from "./api.js";
 
+// Nombres de respaldo mientras se cargan las sucursales desde la API.
 const NOMBRES_SUCURSAL = {
   1: "Ferretería Cancún Centro",
   2: "Ferretería Playa Centro",
   3: "Ferretería Chetumal Centro",
 };
+// Roles autorizados para ver la sección de reportes.
 const ROLES_CON_REPORTES = ["administrador", "gerente"];
+
+// Formatea importes con dos decimales y símbolo de pesos mexicanos.
 const formatoMXN = new Intl.NumberFormat("es-MX", {
   style: "currency",
   currency: "MXN",
   minimumFractionDigits: 2,
 }).format;
 
+// Muestra el estado del inventario: agotado, stock bajo o disponible.
 function BadgeStock({ stock, minimo }) {
   const cantidad = Number(stock);
   const minimoNumero = Number(minimo);
@@ -23,6 +28,7 @@ function BadgeStock({ stock, minimo }) {
   return <span className={`badge ${clase}`}>{texto}</span>;
 }
 
+// Presenta errores de carga y permite volver a intentar la consulta.
 function ErrorDatos({ error, onReintentar }) {
   if (!error) return null;
   return (
@@ -35,13 +41,14 @@ function ErrorDatos({ error, onReintentar }) {
   );
 }
 
+// Cabecera fija con identidad visual, título de la app y datos del usuario activo.
 function Encabezado({ usuario }) {
   return (
     <header className="encabezado">
       <div className="marca">
         <div className="marca-icono" aria-hidden="true">F</div>
         <div>
-          <h1>Ferretería POS</h1>
+          <h1>Ferretería</h1>
           <p className="subtitulo">Inventario y ventas de la sucursal</p>
         </div>
       </div>
@@ -60,11 +67,13 @@ function Encabezado({ usuario }) {
   );
 }
 
+// Formulario de acceso que envía credenciales y entrega la sesión a App.
 function Login({ onLogin, setMensaje }) {
   const [correo, setCorreo] = useState("");
   const [clave, setClave] = useState("");
   const [procesando, setProcesando] = useState(false);
 
+  // Envía correo y clave a /auth/login; controla carga y errores.
   async function enviar(e) {
     e.preventDefault();
     setMensaje("");
@@ -104,6 +113,7 @@ function Login({ onLogin, setMensaje }) {
   );
 }
 
+// Menú principal; oculta reportes para roles sin permiso y permite salir.
 function Nav({ vista, setVista, puedeReportes, salir }) {
   const opciones = [
     { id: "productos", texto: "Productos" },
@@ -130,16 +140,20 @@ function Nav({ vista, setVista, puedeReportes, salir }) {
   );
 }
 
+// Componente raíz: administra sesión, sucursal activa, vista y permisos.
 export default function App() {
   const sesionInicial = leerSesion();
+  // Estado de sesión y navegación, recuperado de sessionStorage al iniciar.
   const [usuario, setUsuario] = useState(sesionInicial?.usuario || null);
   const [vista, setVista] = useState(sesionInicial?.usuario ? "productos" : "login");
   const [sucursal, setSucursal] = useState(String(sesionInicial?.usuario?.id_sucursal || 1));
   const [sucursales, setSucursales] = useState([]);
   const [mensaje, setMensaje] = useState("");
 
+  // Solo administradores y gerentes pueden abrir reportes.
   const puedeReportes = ROLES_CON_REPORTES.includes(usuario?.rol);
 
+  // Revalida la sesión guardada contra /auth/me para usar datos vigentes.
   useEffect(() => {
     if (!sesionInicial?.token) return;
     let activo = true;
@@ -159,12 +173,14 @@ export default function App() {
     return () => { activo = false; };
   }, []);
 
+  // Carga el catálogo de sucursales cuando hay un usuario autenticado.
   useEffect(() => {
     if (usuario) {
       api("/sucursales").then(setSucursales).catch(() => setSucursales([]));
     }
   }, [usuario]);
 
+  // Cierra sesión, limpia almacenamiento y vuelve a la pantalla de acceso.
   function salir() {
     limpiarSesion();
     setUsuario(null);
@@ -173,11 +189,13 @@ export default function App() {
     setMensaje("");
   }
 
+  // Devuelve el nombre legible de la sucursal seleccionada.
   function nombreSucursal(id) {
     const encontrada = sucursales.find((s) => String(s.id_sucursal) === String(id));
     return encontrada?.nombre || NOMBRES_SUCURSAL[id] || `Sucursal ${id}`;
   }
 
+  // Sin sesión se muestra únicamente el acceso y el enlace de salto.
   if (!usuario) {
     return (
       <>
@@ -200,6 +218,7 @@ export default function App() {
     );
   }
 
+  // Con sesión se muestra navegación, selector de sucursal y la vista activa.
   return (
     <>
       <a className="salto" href="#contenido">Ir al contenido principal</a>
@@ -219,6 +238,7 @@ export default function App() {
           </select>
           <span className="sucursal-actual">Sucursal: <strong>{nombreSucursal(sucursal)}</strong></span>
         </section>
+        {/* Cada vista se renderiza solo cuando coincide con la navegación activa. */}
         {vista === "productos" && <Productos puedeCrear={["administrador", "gerente"].includes(usuario.rol)} />}
         {vista === "inventario" && <Inventario sucursal={sucursal} nombreSucursal={nombreSucursal} />}
         {vista === "pos" && <POS sucursal={sucursal} nombreSucursal={nombreSucursal} />}
@@ -228,6 +248,7 @@ export default function App() {
   );
 }
 
+// Catálogo con búsqueda diferida, alta de productos y tabla de resultados.
 function Productos({ puedeCrear }) {
   const [q, setQ] = useState("");
   const [items, setItems] = useState([]);
@@ -237,6 +258,7 @@ function Productos({ puedeCrear }) {
   const [form, setForm] = useState({ sku: "", nombre: "", precio_mxn: "", tipo: "herramienta", etiquetas: "", descripcion: "" });
   const [mensajeForm, setMensajeForm] = useState(null);
 
+  // Espera 250 ms tras escribir y consulta el catálogo; evita peticiones redundantes.
   useEffect(() => {
     let activo = true;
     const t = setTimeout(async () => {
@@ -259,6 +281,7 @@ function Productos({ puedeCrear }) {
     };
   }, [q, intentos]);
 
+  // Convierte precio y etiquetas, crea el producto y refresca la búsqueda.
   async function crear(e) {
     e.preventDefault();
     setMensajeForm(null);
@@ -382,11 +405,13 @@ function Productos({ puedeCrear }) {
   );
 }
 
+// Muestra existencias y mínimos de la sucursal seleccionada.
 function Inventario({ sucursal, nombreSucursal }) {
   const [items, setItems] = useState([]);
   const [error, setError] = useState("");
   const [intentos, setIntentos] = useState(0);
 
+  // Consulta el inventario cada vez que cambia la sucursal o se reintenta.
   useEffect(() => {
     let activo = true;
     api("/inventario?sucursal=" + sucursal)
@@ -451,6 +476,7 @@ function Inventario({ sucursal, nombreSucursal }) {
   );
 }
 
+// Punto de venta: busca artículos, arma el carrito y confirma la venta.
 function POS({ sucursal, nombreSucursal }) {
   const [q, setQ] = useState("");
   const [productos, setProductos] = useState([]);
@@ -459,6 +485,7 @@ function POS({ sucursal, nombreSucursal }) {
   const [msg, setMsg] = useState(null);
   const [procesando, setProcesando] = useState(false);
 
+  // Busca productos para el carrito con retardo y limpia resultados al vaciar q.
   useEffect(() => {
     let activo = true;
     const t = setTimeout(async () => {
@@ -486,6 +513,7 @@ function POS({ sucursal, nombreSucursal }) {
     };
   }, [q]);
 
+  // Agrega un producto al carrito o incrementa su cantidad si ya está.
   function agregar(p) {
     setCarrito((actual) => {
       const existente = actual.find((x) => x.id_producto === p.id_producto);
@@ -496,18 +524,22 @@ function POS({ sucursal, nombreSucursal }) {
     });
   }
 
+  // Ajusta cantidades y elimina la fila cuando llega a cero.
   function cambiarCantidad(idProducto, delta) {
     setCarrito((actual) => actual
       .map((r) => r.id_producto === idProducto ? { ...r, cantidad: r.cantidad + delta } : r)
       .filter((r) => r.cantidad > 0));
   }
 
+  // Quita por completo un artículo del carrito.
   function quitar(idProducto) {
     setCarrito((actual) => actual.filter((r) => r.id_producto !== idProducto));
   }
 
+  // Total calculado en cliente a partir de precio y cantidad de cada fila.
   const total = carrito.reduce((suma, r) => suma + r.cantidad * r.precio_unitario, 0);
 
+  // Envía la venta al backend; el procedimiento valida stock y descuenta existencias.
   async function cobrar() {
     if (procesando || !carrito.length) return;
     setMsg(null);
@@ -615,6 +647,7 @@ function POS({ sucursal, nombreSucursal }) {
   );
 }
 
+// Reportes de ventas, existencias consolidadas y consulta de código postal.
 function Reportes() {
   const [ventas, setVentas] = useState([]);
   const [existencias, setExistencias] = useState([]);
@@ -626,11 +659,13 @@ function Reportes() {
   const [errorPostal, setErrorPostal] = useState("");
   const [consultando, setConsultando] = useState(false);
 
+  // Carga ambos consolidados y se repite al usar el botón Reintentar.
   useEffect(() => {
     api("/reportes/ventas-sucursal").then((data) => { setVentas(data); setErrorVentas(""); }).catch((err) => setErrorVentas(err.message));
     api("/reportes/existencias-consolidado").then((data) => { setExistencias(data); setErrorExistencias(""); }).catch((err) => setErrorExistencias(err.message));
   }, [intentos]);
 
+  // Valida cinco dígitos y consulta el servicio externo de SEPOMEX.
   async function consultarCP(e) {
     e.preventDefault();
     setErrorPostal("");

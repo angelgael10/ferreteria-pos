@@ -3,11 +3,13 @@ const router = express.Router();
 const pool = require('../db/pool');
 const { requiereRol } = require('../middleware/auth');
 
+// Consulta la vista de existencias, opcionalmente filtrada por sucursal
 router.get('/', requiereRol(), async (req, res, next) => {
   const { sucursal } = req.query;
   try {
     let sql = 'SELECT * FROM v_existencias_sucursal';
     const params = [];
+    // Valida el filtro de sucursal y lo agrega a la consulta sólo si se envió
     if (sucursal !== undefined && sucursal !== '') {
       const id = Number(sucursal);
       if (!Number.isInteger(id) || id <= 0) {

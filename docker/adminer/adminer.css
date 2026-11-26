@@ -18,6 +18,8 @@
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   margin: 0;
   padding: 28px;
@@ -33,11 +35,14 @@ body {
 
 /* Barra superior: identidad del herramientero y selector de idioma. */
 #menu {
+  position: static;
+  order: -1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
   flex-wrap: wrap;
+  width: min(1120px, 100%);
   max-width: 1120px;
   margin: 0 auto 18px;
   padding: 16px 24px;
@@ -79,6 +84,121 @@ body {
 #lang select {
   width: auto;
   min-width: 130px;
+}
+
+/* Vista de base de datos: selector arriba, acciones en fila y tablas en tarjetas. */
+body:has(#tables) #menu {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 14px 20px;
+  padding: 22px 26px;
+}
+
+body:has(#tables) #menu h1 {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+body:has(#tables) #menu form:has(#dbs) {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  margin: 0;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+}
+
+body:has(#tables) #menu #dbs {
+  margin: 0;
+  color: #dfe3e8;
+  font-size: 12px;
+}
+
+body:has(#tables) #menu #dbs select {
+  min-width: 150px;
+}
+
+body:has(#tables) #menu p.links {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+body:has(#tables) #menu p.links a {
+  padding: 7px 13px;
+  color: #ffe0c8;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+body:has(#tables) #menu p.links a:hover {
+  color: #ffffff;
+  background: rgba(240, 138, 36, 0.22);
+  border-color: rgba(240, 138, 36, 0.45);
+  text-decoration: none;
+}
+
+body:has(#tables) #menu ul#tables {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+body:has(#tables) #menu ul#tables li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 11px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 13px;
+}
+
+body:has(#tables) #menu ul#tables li:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(240, 138, 36, 0.4);
+}
+
+body:has(#tables) #menu ul#tables li a.select {
+  padding: 0;
+  font-size: 0;
+}
+
+body:has(#tables) #menu ul#tables li a.select::after {
+  content: "Ver";
+  padding: 4px 9px;
+  color: #ffd7b8;
+  background: rgba(240, 138, 36, 0.18);
+  border: 1px solid rgba(240, 138, 36, 0.35);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+body:has(#tables) #menu ul#tables li a.structure {
+  min-width: 0;
+  color: #ffffff;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+  text-decoration: none;
 }
 
 /* Tarjeta principal con una línea de acento simétrica. */
@@ -315,4 +435,7 @@ pre {
   #content table.layout td { padding-top: 0; }
   #content table.layout tr { display: block; }
   #content form > p { flex-direction: column; }
+  body:has(#tables) #menu { grid-template-columns: 1fr; padding: 18px; }
+  body:has(#tables) #menu form:has(#dbs) { justify-self: start; }
+  body:has(#tables) #menu ul#tables { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

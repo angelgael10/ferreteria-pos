@@ -41,17 +41,19 @@ function Encabezado({ usuario }) {
       <div className="marca">
         <div className="marca-icono" aria-hidden="true">F</div>
         <div>
-          <h1>Ferretería POS multisucursal</h1>
-          <p className="subtitulo">
-            Inventario y punto de venta · Cancún, Playa del Carmen y Chetumal
-          </p>
-          <p className="folio-linea">SERIE 2026 · HOJA 01 · MOSTRADOR MULTISUCURSAL</p>
+          <h1>Ferretería POS</h1>
+          <p className="subtitulo">Inventario y ventas por sucursal</p>
         </div>
       </div>
       {usuario && (
         <div className="usuario-chip">
           <strong>{usuario.nombre}</strong>
-          <span>{usuario.rol} · Sucursal {usuario.id_sucursal || "todas"}</span>
+          <span>
+            {usuario.rol.charAt(0).toUpperCase() + usuario.rol.slice(1)} ·{" "}
+            {usuario.id_sucursal
+              ? NOMBRES_SUCURSAL[usuario.id_sucursal]
+              : "Todas las sucursales"}
+          </span>
         </div>
       )}
     </header>
@@ -82,7 +84,7 @@ function Login({ onLogin, setMensaje }) {
 
   return (
     <form className="card login-card" onSubmit={enviar}>
-      <span className="eyebrow">00 / Acceso al mostrador</span>
+      <span className="eyebrow">Acceso</span>
       <h3>Iniciar sesión</h3>
       <p className="texto-ayuda">Accede con tu usuario para comenzar a vender.</p>
       <div className="fila">
@@ -215,7 +217,7 @@ export default function App() {
               <option key={s.id_sucursal} value={s.id_sucursal}>{s.nombre}</option>
             ))}
           </select>
-          <span className="sucursal-actual">Vendiendo en: <strong>{nombreSucursal(sucursal)}</strong></span>
+          <span className="sucursal-actual">Sucursal: <strong>{nombreSucursal(sucursal)}</strong></span>
         </section>
         {vista === "productos" && <Productos puedeCrear={["administrador", "gerente"].includes(usuario.rol)} />}
         {vista === "inventario" && <Inventario sucursal={sucursal} nombreSucursal={nombreSucursal} />}
@@ -281,7 +283,7 @@ function Productos({ puedeCrear }) {
     <section className="card">
       <div className="card-header">
         <div>
-          <span className="eyebrow">01 / Mostrador</span>
+          <span className="eyebrow">Catálogo</span>
           <h3>Catálogo de productos</h3>
           <p className="texto-ayuda">Búsqueda en vivo por nombre, SKU o etiqueta.</p>
         </div>
@@ -407,7 +409,7 @@ function Inventario({ sucursal, nombreSucursal }) {
     <section className="card">
       <div className="card-header">
         <div>
-          <span className="eyebrow">02 / Almacén</span>
+          <span className="eyebrow">Inventario</span>
           <h3>Existencias por sucursal</h3>
           <p className="texto-ayuda">Stock actual y mínimo configurado para {nombreSucursal(sucursal)}.</p>
         </div>
@@ -533,7 +535,7 @@ function POS({ sucursal, nombreSucursal }) {
       <section className="card">
         <div className="card-header">
           <div>
-            <span className="eyebrow">03 / Venta · búsqueda</span>
+            <span className="eyebrow">Buscar productos</span>
             <h3>Buscar producto</h3>
             <p className="texto-ayuda">Agrega artículos al carrito desde aquí.</p>
           </div>
@@ -561,7 +563,7 @@ function POS({ sucursal, nombreSucursal }) {
       <section className="card">
         <div className="card-header">
           <div>
-            <span className="eyebrow">03 / Venta · cobro</span>
+            <span className="eyebrow">Carrito</span>
             <h3>Carrito</h3>
             <p className="texto-ayuda">Sucursal: {nombreSucursal(sucursal)}</p>
           </div>
@@ -650,7 +652,7 @@ function Reportes() {
   return (
     <div className="reportes-grid">
       <section className="card reporte-card">
-        <span className="eyebrow">04 / Servicio externo</span>
+        <span className="eyebrow">Código postal</span>
         <h3>Consulta de código postal</h3>
         <p className="texto-ayuda">Datos reales de SEPOMEX servidos por la API Postali, sin token.</p>
         <form className="formulario-postal" onSubmit={consultarCP}>
@@ -670,7 +672,7 @@ function Reportes() {
         )}
       </section>
       <section className="card reporte-card">
-        <span className="eyebrow">04 / Ventas</span>
+        <span className="eyebrow">Ventas por sucursal</span>
         <h3>Ventas por sucursal</h3>
         <ErrorDatos error={errorVentas} onReintentar={() => setIntentos((n) => n + 1)} />
         {ventas.length === 0 && !errorVentas ? <p className="vacio">Sin ventas registradas.</p> : (
@@ -692,7 +694,7 @@ function Reportes() {
         )}
       </section>
       <section className="card reporte-card">
-        <span className="eyebrow">04 / Stock total</span>
+        <span className="eyebrow">Existencias</span>
         <h3>Existencias consolidadas</h3>
         <ErrorDatos error={errorExistencias} onReintentar={() => setIntentos((n) => n + 1)} />
         {existencias.length === 0 && !errorExistencias ? <p className="vacio">Sin existencias registradas.</p> : (

@@ -13,16 +13,16 @@ Este documento reúne la evidencia solicitada por la unidad IV de Programación 
 
 | Componente | Responsabilidad | Archivo |
 |---|---|---|
-| `App` | Estado global de sesión, vista, sucursal y mensajes; decide qué sección renderizar. | `app/frontend/src/App.jsx` línea 131 |
-| `Encabezado` | Marca, folio de entrega y datos del usuario. | `app/frontend/src/App.jsx` línea 38 |
-| `Login` | Formulario controlado, envío de credenciales y mensaje de error. | `app/frontend/src/App.jsx` línea 61 |
-| `Nav` | Navegación por vistas, ocultación de reportes por rol y salida. | `app/frontend/src/App.jsx` línea 105 |
+| `App` | Estado global de sesión, vista, sucursal y mensajes; decide qué sección renderizar. | `app/frontend/src/App.jsx` línea 133 |
+| `Encabezado` | Marca, título de la aplicación, sucursal activa y datos del usuario. | `app/frontend/src/App.jsx` línea 38 |
+| `Login` | Formulario controlado, envío de credenciales y mensaje de error. | `app/frontend/src/App.jsx` línea 63 |
+| `Nav` | Navegación por vistas, ocultación de reportes por rol y salida. | `app/frontend/src/App.jsx` línea 107 |
 | `BadgeStock` | Estado visual de stock con texto: normal, bajo o agotado. | `app/frontend/src/App.jsx` línea 16 |
 | `ErrorDatos` | Error de carga con botón de reintento. | `app/frontend/src/App.jsx` línea 26 |
-| `Productos` | Catálogo, búsqueda en vivo y alta de productos. | `app/frontend/src/App.jsx` línea 229 |
-| `Inventario` | Existencias filtradas por sucursal. | `app/frontend/src/App.jsx` línea 383 |
-| `POS` | Búsqueda, carrito, cantidades, total y cobro. | `app/frontend/src/App.jsx` línea 452 |
-| `Reportes` | Ventas consolidadas, stock total y consulta a Postali. | `app/frontend/src/App.jsx` línea 616 |
+| `Productos` | Catálogo, búsqueda en vivo y alta de productos. | `app/frontend/src/App.jsx` línea 231 |
+| `Inventario` | Existencias filtradas por sucursal. | `app/frontend/src/App.jsx` línea 385 |
+| `POS` | Búsqueda, carrito, cantidades, total y cobro. | `app/frontend/src/App.jsx` línea 454 |
+| `Reportes` | Ventas consolidadas, stock total y consulta a Postali. | `app/frontend/src/App.jsx` línea 618 |
 
 Los hooks utilizados son `useState` y `useEffect`. No se añadió una librería de estado externa porque el estado de esta interfaz es local a cada vista y se sincroniza con la API mediante `api(path, options)`.
 

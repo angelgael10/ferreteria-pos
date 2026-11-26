@@ -6,15 +6,15 @@ Este documento reúne la evidencia solicitada por la unidad II de Programación 
 
 | Requisito | Aplicación en el proyecto | Evidencia |
 |---|---|---|
-| HTML5 semántico | La interfaz usa `header`, `nav`, `main`, `section`, `form`, `table`, `caption` y `th scope="col"`. | `app/frontend/src/App.jsx` líneas 40, 113, 182-204, 355-362 y 679-702. |
+| HTML5 semántico | La interfaz usa `header`, `nav`, `main`, `section`, `form`, `table`, `caption` y `th scope="col"`. | `app/frontend/src/App.jsx` líneas 40, 115, 184-206, 357-364 y 681-704. |
 | Idioma y codificación | `html lang="es"` y `meta charset="UTF-8"`; la base también usa `SET client_encoding = 'UTF8'`. | `app/frontend/index.html` líneas 3 y 5; `db/06_datos.sql`; `db/07_correcion_texto.sql`. |
 | viewport y diseño adaptable | `meta viewport` y media queries para escritorio, tablet y móvil. | `app/frontend/index.html` línea 6; `app/frontend/src/diseno.css` líneas 911-1015. |
-| Etiquetas asociadas a controles | Todos los campos usan `label htmlFor` con el `id` del control. | `app/frontend/src/App.jsx` líneas 90-94, 209, 298, 312-338, 541 y 657. |
-| Navegación identificada | `nav` con `aria-label="Navegación principal"` y enlace de salto al contenido. | `app/frontend/src/App.jsx` líneas 113, 182 y 203. |
-| Mensajes accesibles | Errores con `role="alert"`; resultados de postal con `role="status"`; estados de stock con texto visible. | `app/frontend/src/App.jsx` líneas 29, 185, 206, 351, 418, 571, 661 y 663. |
+| Etiquetas asociadas a controles | Todos los campos usan `label htmlFor` con el `id` del control. | `app/frontend/src/App.jsx` líneas 92-96, 211, 300, 314-340, 543 y 659. |
+| Navegación identificada | `nav` con `aria-label="Navegación principal"` y enlace de salto al contenido. | `app/frontend/src/App.jsx` líneas 115, 184 y 205. |
+| Mensajes accesibles | Errores con `role="alert"`; resultados de postal con `role="status"`; estados de stock con texto visible. | `app/frontend/src/App.jsx` líneas 29, 187, 208, 353, 420, 573, 663 y 665. |
 | Foco visible | Regla `button:focus-visible` para teclado. | `app/frontend/src/styles.css` línea 374. |
 | Movimiento reducido | `@media (prefers-reduced-motion: reduce)` desactiva transiciones. | `app/frontend/src/styles.css` línea 806 y `app/frontend/src/diseno.css` línea 1011. |
-| Tablas comprensibles | `caption`, `thead`, `th scope="col"` y celdas numéricas alineadas. | `app/frontend/src/App.jsx` líneas 355-362, 422-430, 575-582 y 679-702. |
+| Tablas comprensibles | `caption`, `thead`, `th scope="col"` y celdas numéricas alineadas. | `app/frontend/src/App.jsx` líneas 357-364, 424-432, 577-584 y 681-704. |
 
 ## 2. Especificación del DOM
 

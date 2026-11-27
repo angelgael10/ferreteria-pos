@@ -4,12 +4,18 @@ CARPETA DE ENTREGA - PROYECTO FERRETERÍA POS
 Archivo principal:
 - Trabajo_realizado_ferreteria_POS.pdf
 
-El PDF incluye portada, introducción, objetivos, alcance y criterios de
-aceptación, backlog y sprints con burndown y retrospectivas, desarrollo por
-materia/unidad con evidencias, pruebas y resultados, conclusiones,
-ajustes finales, tabla de correspondencia con la guía, referencias IEEE [1]
-y [2], y anexos (manual técnico, manual de usuario, declaración de IA y
-bitácora de IA con 10 interacciones).
+Este archivo es la versión final. Las versiones anteriores del documento
+fueron eliminadas; no usar otras copias sueltas.
+
+El PDF sigue la estructura de la guía: portada e índice, introducción,
+objetivos, alcance e historias de usuario, metodología Scrum con cronograma,
+burndown y retrospectivas, desarrollo por materia/unidad con evidencias,
+pruebas y resultados (incluye el apartado 6.4 con capturas breves de código
+real: herencia, FOR UPDATE, HMAC y Bmx-Token), conclusiones, tabla de
+correspondencia y referencias IEEE numeradas [1]-[7] citadas en el texto.
+Los anexos traen el manual técnico, el manual
+de usuario, la declaración y bitácora de IA con 10 interacciones, y las
+capturas adicionales.
 
 Capturas reales (docs/evidencias/capturas):
 - 01-login.png
@@ -25,6 +31,12 @@ Capturas reales (docs/evidencias/capturas):
 - 11-login-movil.png
 - 12-github-repo.png
 - 13-concurrencia-sesiones.png
+
+Capturas visuales del código real (docs/entrega_word):
+- codigo_herencia.png
+- codigo_transaccion.png
+- codigo_auth.png
+- codigo_banxico.png
 
 Evidencias de ejecución (docs/evidencias):
 - api_externa_resultados.txt
@@ -47,4 +59,4 @@ Enlaces:
 - Repositorio: https://github.com/angelgael10/ferreteria-pos
 - Tablero: https://github.com/users/angelgael10/projects/1
 
-Estado: 18/18 issues cerrados, capturas actualizadas y cambios publicados.
+Estado: 18/18 issues cerrados, capturas actualizadas y cambio en vivo preparado en docs/evidencias/guion_demo_vivo.md.

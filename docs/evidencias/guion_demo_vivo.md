@@ -39,11 +39,11 @@ Evidencia: capturas 02, 03 y 05.
 4. En `psql` ejecutar:
 
 ```sql
-SELECT id_sucursal, sku, stock
-FROM existencia
-WHERE id_sucursal = 1 AND sku = 'HER-001';
+SELECT id_sucursal, id_producto, stock
+FROM inventario
+WHERE id_sucursal = 1 AND id_producto = 1;
 
-SELECT id_bitacora, accion, detalle
+SELECT id_bitacora, operacion, detalle
 FROM bitacora
 ORDER BY id_bitacora DESC
 LIMIT 2;
@@ -65,21 +65,24 @@ Evidencia: capturas 09 y 10; `docs/evidencias/api_externa_resultados.txt`.
 Preparación:
 
 ```sql
-UPDATE existencia SET stock = 1 WHERE id_sucursal = 1 AND sku = 'HER-001';
+UPDATE inventario SET stock = 1 WHERE id_sucursal = 1 AND id_producto = 6;
 ```
 
 Sesión A:
 
 ```sql
 BEGIN;
-SELECT registrar_venta(1, 1, 1);
+SELECT registrar_venta('V-CONC-DEMO-A', 1, 3,
+  '[{"id_producto":6,"cantidad":1,"precio_unitario":99}]'::jsonb);
+SELECT pg_sleep(10);
 ```
 
 Sesión B, iniciada antes de confirmar A:
 
 ```sql
 BEGIN;
-SELECT registrar_venta(1, 1, 1);
+SELECT registrar_venta('V-CONC-DEMO-B', 1, 4,
+  '[{"id_producto":6,"cantidad":1,"precio_unitario":99}]'::jsonb);
 ```
 
 Confirmar A:

@@ -13,12 +13,13 @@
    - `archive_mode = on`
    - `archive_command = 'cp %p /var/lib/postgresql/wal_archive/%f'` (crear carpeta y permisos)
    - Reiniciar contenedor.
-2. Tomar respaldo base:
-   - `docker exec ferreteria_db mkdir -p /var/lib/postgresql/wal_archive`
-   - `docker exec ferreteria_db pg_basebackup -U ferreteria -D /var/lib/postgresql/basebackup -Fp -Xs -P`
+2. Tomar respaldo base en el contenedor usado en la evidencia:
+   - `docker exec pitr_src mkdir -p /var/lib/postgresql/wal_archive`
+   - `docker exec pitr_src pg_basebackup -h 127.0.0.1 -U ferreteria -D /backup/base -Xs -P`
 3. Generar cambios (insertar datos) y anotar la hora objetivo.
-4. Simular fallo y restaurar:
-   - Detener contenedor, reemplazar datos por el respaldo base, crear `recovery.signal` (PG12+) y configurar `restore_command` y `recovery_target_time` en configuración.
+4. Simular fallo y restaurar en `pitr_restore`:
+   - Reemplazar los datos por `/backup/base`, configurar `restore_command`, `recovery_target_time` y `recovery_target_action = 'promote'`.
+   - Crear `recovery.signal` antes del primer arranque de `pitr_restore`.
    - Iniciar y verificar que los datos quedan en el punto solicitado.
 5. Capturar comandos y resultados (hora objetivo, datos antes/después).
 

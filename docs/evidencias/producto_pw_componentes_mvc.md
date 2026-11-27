@@ -57,8 +57,8 @@ Evidencia: `docs/evidencias/capturas/07-pos-carrito.png`, `docs/evidencias/trasp
 ## 4. Verificación
 
 - `npm run build` compila el frontend sin errores.
-- `node --check` pasa en los 11 archivos del backend.
+- `node --check` pasa en los archivos JavaScript del backend.
 - `npm test` pasa las 4 pruebas mínimas del backend en `app/backend/tests/auth.test.js`.
 - `GET /api/health` responde 200 con PostgreSQL activo.
-- Selenium verificó búsqueda, inventario, punto de venta, reportes, login móvil y consola sin errores.
+- Las capturas 03, 05, 07, 08 y 11 documentan búsqueda, inventario, punto de venta, reportes y login móvil.
 - El código JavaScript de frontend y backend quedó comentado en español para explicar el propósito de cada componente, efecto, validación, transacción y respuesta.

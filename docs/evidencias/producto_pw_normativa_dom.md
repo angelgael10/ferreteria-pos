@@ -52,8 +52,8 @@ Las vistas no son páginas independientes: son secciones que React muestra u ocu
 ## 4. Verificación
 
 - `npm run build` en `app/frontend` termina sin errores.
-- `node --check` en los 11 archivos del backend termina sin errores.
+- `node --check` en los archivos JavaScript del backend termina sin errores.
 - `npm test` en `app/backend` ejecuta 4 pruebas de token, roles y serie de Banxico; todas pasan.
-- Selenium comprobó: acentos reales en el selector de sucursales, sin desbordes en 1440 px ni en 390 px, consola sin errores y estilos calculados de la paleta naranja/carbón y las tres fuentes.
+- Las capturas 01, 03, 05, 07 y 11 documentan acentos reales en el selector de sucursales y el diseño en escritorio y móvil.
 - Verificación de accesibilidad: `a.salto` recibe el foco y lleva a `#contenido`; `main#contenido` existe en login y en la sesión iniciada; `nav.barra` conserva `aria-label`, hay `th[scope="col"]` y la consola queda sin errores.
 - Capturas relacionadas: `docs/evidencias/capturas/01-login.png`, `03-busqueda-en-vivo.png`, `05-inventario.png`, `07-pos-carrito.png` y `11-login-movil.png`.

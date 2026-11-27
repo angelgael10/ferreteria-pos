@@ -36,23 +36,32 @@ Evidencia: mostrar `\d+ venta_part` y en qué partición cae cada fila.
 ## 3. Consultas distribuidas con postgres_fdw
 ```sql
 CREATE EXTENSION postgres_fdw;
-CREATE SERVER srv_playa FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'db_playa', dbname 'ferreteria', port '5432');
-CREATE USER MAPPING FOR ferreteria SERVER srv_playa OPTIONS (user 'ferreteria', password '...');
-CREATE FOREIGN TABLE inventario_playa (id_inventario int, id_sucursal int, id_producto int, stock int, stock_minimo int, actualizado_en timestamp)
-  SERVER srv_playa OPTIONS (schema_name 'public', table_name 'inventario');
-SELECT * FROM inventario_playa; -- consulta remota
+CREATE SERVER srv_b FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'dist_b', dbname 'ferreteria', port '5432');
+CREATE USER MAPPING FOR ferreteria SERVER srv_b OPTIONS (user 'ferreteria', password '...');
+CREATE FOREIGN TABLE inventario_b_remoto (id_inventario int, id_sucursal int, id_producto int, stock int, stock_minimo int, actualizado_en timestamp)
+  SERVER srv_b OPTIONS (schema_name 'public', table_name 'inventario');
+SELECT * FROM inventario_b_remoto; -- consulta remota
 ```
 
 ## 4. Transacción distribuida en dos fases (2PC)
 ```sql
 -- Requiere max_prepared_transactions > 0 en todos los nodos
+-- En dist_a:
 BEGIN;
--- operaciones locales y/o remotas vía FDW
-PREPARE TRANSACTION 'traspaso_001';
--- verificar en otros nodos/estado y luego:
-COMMIT PREPARED 'traspaso_001'; -- o ROLLBACK PREPARED
+INSERT INTO traspaso_2pc_a2 VALUES (502);
+PREPARE TRANSACTION 'traspaso_2pc_a2';
+
+-- En dist_b:
+BEGIN;
+INSERT INTO traspaso_2pc_b2 VALUES (502);
+PREPARE TRANSACTION 'traspaso_2pc_b2';
+
+-- Después de verificar pg_prepared_xacts en ambos nodos:
+COMMIT PREPARED 'traspaso_2pc_a2';
+COMMIT PREPARED 'traspaso_2pc_b2';
 ```
-Evidencia: mostrar `pg_prepared_xacts` y el resultado del traspaso coordinado.
+PostgreSQL no permite `PREPARE TRANSACTION` cuando la transacción ya operó sobre tablas foráneas FDW: sale `ERROR: cannot PREPARE a transaction that has operated on postgres_fdw foreign tables`. Por eso la evidencia usa una transacción preparada explícita por nodo.
+Evidencia: mostrar `pg_prepared_xacts` y las filas 502 en `docs/evidencias/distribuida_resultados.txt`.
 
 ## Nota de ejecución
 Montar 3 nodos+réplica requiere un `docker-compose` extendido y configuración de red; ejecutar paso a paso, capturar errores/salidas reales y documentarlos en el reporte.

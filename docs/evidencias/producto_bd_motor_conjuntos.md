@@ -30,11 +30,11 @@ Salida real de la versión:
 | Tipo compuesto | `db/01_esquema.sql` | `dimensiones_t` usado en productos. |
 | Arreglos | `db/01_esquema.sql` y `db/06_datos.sql` | `etiquetas TEXT[]` y `codigos_alternos TEXT[]`. |
 | JSONB | `db/01_esquema.sql` y `db/06_datos.sql` | `especificaciones JSONB` y `detalle JSONB` en bitácora. |
-| Vistas | `db/05_vistas.sql` | `v_existencias_sucursal`, `v_ventas_sucursal` y `v_stock_consolidado`. |
+| Vistas | `db/05_vistas.sql` | `v_existencias_sucursal`, `v_existencias_consolidado` y `v_ventas_por_sucursal`. |
 | Procedimientos y funciones | `db/03_funciones.sql` | `registrar_venta`, `registrar_traspaso` y helpers. |
 | Triggers | `db/04_triggers.sql` | Descuento de stock y bitácora. |
 | Transacciones y concurrencia | `db/03_funciones.sql`; `db/pruebas/concurrencia_ultimo_articulo.sql` | `SELECT ... FOR UPDATE`; prueba con dos sesiones. |
-| Recuperación | `db/pruebas/pitr.sql`; `docs/evidencias/pitr_resultados.txt` | `pg_basebackup` + WAL. |
+| Recuperación | `db/pruebas/pitr_respaldo.md`; `docs/evidencias/pitr_resultados.txt` | `pg_basebackup` + WAL. |
 | Distribución | `db/pruebas/distribuida_notas.md`; `docs/evidencias/distribuida_resultados.txt` | Particiones LIST, streaming, `postgres_fdw` y 2PC. |
 
 ## 3. Arreglos

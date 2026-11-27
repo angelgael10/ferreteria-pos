@@ -88,7 +88,7 @@ Traspaso registrado:
 ```
 Bitácora: eventos `UPDATE` de inventario en origen/destino y `TRASPASO` con id 1. Conclusión: la operación es atómica (se descuenta en origen y suma en destino dentro de la misma transacción).
 
-> Nota de ejecución: los dos primeros intentos fallaron por el escapado de comillas JSON en PowerShell; se corrigió pasando el SQL desde un archivo (`Get-Content -Raw archivo.sql | docker exec -i ... psql`). Queda documentado como aprendizaje real.
+> Nota de ejecución: el payload se pasó desde un archivo SQL (`Get-Content -Raw archivo.sql | docker exec -i ... psql`) para evitar problemas de escapado de comillas.
 
 ## 4. Consumo de API externa (Web U.III)
 

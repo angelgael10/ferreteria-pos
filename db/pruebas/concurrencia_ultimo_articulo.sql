@@ -5,12 +5,12 @@
 
 -- ===== SESIÓN A (ejecutar paso a paso) =====
 -- BEGIN; -- inicia transacción A
--- SELECT registrar_venta('V-CONC-A', 1, 3, '[{"id_producto":6,"cantidad":1,"precio_unitario":150.00}]'::jsonb);
+-- SELECT registrar_venta('V-CONC-A', 1, 3, '[{"id_producto":6,"cantidad":1,"precio_unitario":99}]'::jsonb);
 -- -- No hacer COMMIT aún; dejar abierta para simular concurrencia y luego COMMIT;
 
 -- ===== SESIÓN B (ejecutar mientras A sigue abierta) =====
 -- BEGIN; -- inicia transacción B
--- SELECT registrar_venta('V-CONC-B', 1, 4, '[{"id_producto":6,"cantidad":1,"precio_unitario":150.00}]'::jsonb);
+-- SELECT registrar_venta('V-CONC-B', 1, 4, '[{"id_producto":6,"cantidad":1,"precio_unitario":99}]'::jsonb);
 -- -- Esta sesión quedará bloqueada por FOR UPDATE hasta que A haga COMMIT/ROLLBACK;
 -- -- al continuar, debe fallar con "Stock insuficiente..." porque A ya descontó.
 -- COMMIT; -- o ROLLBACK según resultado

@@ -11,7 +11,7 @@
 - **Objetivo:** POS, traspasos, funciones/triggers/transacciones, concurrencia, frontend dinámico.
 - **Qué se logró:** POS con carrito, traspaso `T-DEMO-01` atómico, funciones/triggers/vistas y prueba de concurrencia con una venta confirmada (`V-CONC-A`) y otra rechazada.
 - **Qué funcionó bien:** `SELECT ... FOR UPDATE` serializó el acceso al último artículo y el stock nunca quedó negativo; el frontend corrió sin errores.
-- **Qué se puede mejorar:** el escapado de JSON en PowerShell provocó fallos; se resolvió usando archivos SQL. La bitácora duplica eventos por venta (trigger + función).
+- **Qué se puede mejorar:** el escapado de JSON en la consola provocó fallos; se resolvió usando archivos SQL. La bitácora duplica eventos por venta (trigger + función).
 - **Acciones para el siguiente sprint:** ejecutar PITR, EXPLAIN, almacenamiento y la práctica de BD distribuida.
 
 ## Sprint 3 – Integración
@@ -26,4 +26,4 @@
 - **Qué se logró:** reportes con control de roles, sesión HMAC, API Banxico, 13 capturas reales, repetición de la concurrencia, 18/18 issues cerrados, README y documentación final.
 - **Qué funcionó bien:** cada evidencia se generó ejecutando el sistema y documentando también los errores y su corrección; `npm run build` del frontend pasó sin errores.
 - **Qué se puede mejorar:** la búsqueda `ILIKE '%...%'` podría optimizarse con `pg_trgm` en las tablas hijas; la bitácora duplica eventos por venta; conviene ensayar el cambio en vivo (ajustar stock o crear una venta).
-- **Lecciones aprendidas:** no documentar resultados sin ejecutarlos; los fallos (BOM, comillas de PowerShell, `recovery.signal`, límite de FDW y `sku` NULL al insertar en tablas hijas) son parte válida del aprendizaje y de la bitácora.
+- **Lecciones aprendidas:** no documentar resultados sin ejecutarlos; los fallos (BOM, comillas en la consola, `recovery.signal`, límite de FDW y `sku` NULL al insertar en tablas hijas) son parte válida del aprendizaje y de la bitácora.

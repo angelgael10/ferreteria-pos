@@ -1,0 +1,65 @@
+SET
+      fecha_consulta_utc      |    base    
+------------------------------+------------
+ 2026-11-27 17:33:30.69367+00 | ferreteria
+(1 row)
+
+ sucursales | usuarios | productos | inventario | ventas | traspasos | bitacora 
+------------+----------+-----------+------------+--------+-----------+----------
+          3 |        8 |         6 |         12 |      7 |         1 |       38
+(1 row)
+
+ id_venta |      folio      |   estado   
+----------+-----------------+------------
+        1 | V-1794878101872 | completada
+        2 | V-1794878131856 | completada
+        3 | V-CONC-A        | completada
+        5 | V-CONC-LIVE-A   | completada
+        7 | V-1795670220352 | completada
+        8 | V-1795670287730 | completada
+        9 | V-1795670355244 | completada
+(7 rows)
+
+ id_traspaso |   folio   |   estado   
+-------------+-----------+------------
+           1 | T-DEMO-01 | completado
+(1 row)
+
+ tabla_afectada | operacion | eventos 
+----------------+-----------+---------
+ inventario     | INSERT    |      12
+ inventario     | UPDATE    |      11
+ traspaso       | TRASPASO  |       1
+ venta          | INSERT    |       7
+ venta          | VENTA     |       7
+(5 rows)
+
+ id_sucursal |           nombre           |      ciudad      
+-------------+----------------------------+------------------
+           1 | Ferretería Cancún Centro   | Cancún
+           2 | Ferretería Playa Centro    | Playa del Carmen
+           3 | Ferretería Chetumal Centro | Chetumal
+(3 rows)
+
+   sku   |           nombre            
+---------+-----------------------------
+ ELE-001 | Foco LED 12W
+ ELE-002 | Extensión eléctrica 5m
+ HER-001 | Martillo uña 16oz
+ HER-002 | Desarmador plano 1/4
+ MAT-001 | Cemento gris 50kg
+ MAT-002 | Pintura vinílica blanca 19L
+(6 rows)
+
+ mangos_con_interrogacion 
+--------------------------
+                        0
+(1 row)
+
+
+REAPLICACION db/07_correcion_texto.sql (idempotente)
+SET
+UPDATE 3
+UPDATE 3
+UPDATE 6
+UPDATE 0

@@ -8,7 +8,7 @@
 - **Base de datos (Docker):** `docker-compose.yml` (servicio `db`, imagen `postgres:18`, contenedor `ferreteria_db`, host `localhost:5433`, BD/usuario `ferreteria`, volumen `pgdata`, scripts montados en `/docker-entrypoint-initdb.d`).
 - **Scripts SQL:** `db/01_esquema.sql` (tablas núcleo, tipo compuesto, arreglos, JSONB), `db/02_herencia.sql` (INHERITS), `db/03_funciones.sql` (PL/pgSQL venta/traspaso), `db/04_triggers.sql` (bitácora), `db/05_vistas.sql`, `db/06_datos.sql` (semilla), `db/07_correcion_texto.sql` (UTF-8 en base ya cargada). Pruebas/notas: `db/pruebas/`.
 
-- **Backend API:** `app/backend/src` (`index.js`, `db/pool.js`, `middleware/auth.js` y rutas en `routes/`: auth, productos, inventario, ventas, traspasos, reportes, codigosPostales, sucursales). Pruebas mínimas: `app/backend/tests/auth.test.js` con `npm test`.
+- **Backend API:** `app/backend/src` (`index.js`, `db/pool.js`, `middleware/auth.js` y rutas en `routes/`: auth, productos, inventario, ventas, traspasos, reportes, banxico, sucursales). Pruebas mínimas: `app/backend/tests/auth.test.js` con `npm test`.
 
 - **Frontend:** `app/frontend/src` (`App.jsx`, `api.js`, `main.jsx`, `styles.css`, `diseno.css`, `colores.css`, `tipografia.css`, `vite.config.js`).
 
@@ -108,8 +108,8 @@ Detalle completo con salidas reales en `docs/evidencias/resumen_evidencias.md`, 
 - **API externa (Web U.III):** `GET /api/banxico/tipo-cambio` respondió 200 con serie SF43718, fecha `25/11/2026` y valor `19.7040` MXN/USD; token inválido → 400 controlado. Salida en `docs/evidencias/api_externa_resultados.txt` y capturas 09/10.
 - **PITR (U.IV):** clúster aparte `pitr_src`/`pitr_restore`; respaldo base de 31364 kB + 5 segmentos WAL archivados. Se recuperó al tiempo `2026-11-17 01:42:06.042778+00`: `pg_is_in_recovery = f` y solo filas 1 y 2; la fila 3 (posterior) no se recuperó. Evidencia en `docs/evidencias/pitr_resultados.txt`.
 - **BD distribuida (U.V):** nodos `dist_a` (5436), `dist_b` (5437) y `dist_replica` (5438) en la red `dist_net`. Particionamiento LIST con poda (`EXPLAIN` solo lee `venta_part_playa`), replicación streaming verificada con `pg_stat_replication` y fila visible en la réplica (`pg_is_in_recovery = t`), FDW de A hacia B, y 2PC con `traspaso_2pc_a2`/`traspaso_2pc_b2` visibles en `pg_prepared_xacts` y confirmadas en ambos nodos. Limitación real: `postgres_fdw` no soporta `PREPARE TRANSACTION` sobre tablas foráneas. Evidencia en `docs/evidencias/distribuida_resultados.txt`.
-- **Aprendizaje de ejecución:** el JSON del traspaso debe pasarse desde archivo SQL (`Get-Content -Raw ... | docker exec -i ... psql`) para evitar problemas de escape de comillas en PowerShell.
+- **Aprendizaje de ejecución:** el JSON del traspaso debe pasarse desde archivo SQL (`Get-Content -Raw ... | docker exec -i ... psql`) para evitar problemas de escape de comillas en la consola.
 
 
-- BD en Docker saludable (PG 18.6). Scripts `01`-`06` aplicados; tras corregir FKs por herencia: **3 sucursales, 8 usuarios, 6 productos, 12 registros de inventario**, 4 ventas (`V-CONC-A`, 2 de la UI y `V-CONC-LIVE-A`), 1 traspaso (`T-DEMO-01`) y 28 eventos de bitácora. Producto 6 en sucursal 1 quedó en stock 0 tras la prueba de concurrencia.
+- BD en Docker saludable (PG 18.6). Scripts `01`-`07` aplicados (el 07 se reejecutó de forma idempotente); conteos reales consultados el 2026-11-27 en la BD activa (salida cruda en `docs/evidencias/conteos_finales.txt`): **3 sucursales, 8 usuarios, 6 productos, 12 registros de inventario, 7 ventas, 1 traspaso (`T-DEMO-01`) y 38 eventos de bitácora**. Las ventas incluyen `V-CONC-A`, `V-CONC-LIVE-A` y cinco folios generados desde la UI; el detalle literal está en la salida cruda. Producto 6 en sucursal 1 quedó en stock 0 tras la prueba de concurrencia.
 - Backend/Frontend ejecutados (backend :3001, frontend :5173); `npm run build` pasó. Hay 13 capturas reales en `docs/evidencias/capturas/`, 18/18 issues cerrados y el PDF final en `docs/entrega_word/`.
